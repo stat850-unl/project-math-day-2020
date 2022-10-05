@@ -1,6 +1,7 @@
 Stat 850 Project Description
 ================
-Firstname Lastname, Firstname Lastname, …
+Molly Creagar, Charles Bonk
+(Math Day 2020)
 
 ## Instructions
 
@@ -27,4 +28,5 @@ Describe avenues you might explore using the data
 
 ## Group Members
 
-List all of the project contributors here.
+Molly Creagar
+Charles Bonk
