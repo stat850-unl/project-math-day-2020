@@ -47,9 +47,9 @@ We want to make an R Shiny app to access, analyze, and explore the various data 
 
 -Add some nice graphics (artist trends, yearly/monthly trends, etc)
 
--Assuming I can get the owner to identify his 'must haves' vs just the desirables, we should be able to provide a client-requested interface that can be hosted in a shiny app and used as a replacement for the current Google Sheets method.
+-Provide a client-requested interface that can be hosted in a Shiny app and used as a replacement for the current Google Sheets method.
 
--Incorporate an owner-friendly element where the owner can just submit a single month's worth of data and have the database update
+-Incorporate an owner-friendly element where the owner can just submit a single month's worth of data and have the database update with new statistics and graphics
 
 ## Group Members
 
