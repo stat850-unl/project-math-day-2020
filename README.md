@@ -28,6 +28,7 @@ The 'data set' is more of a database, as there are four separate Google Sheets w
 - [Albums](https://docs.google.com/spreadsheets/d/1QffuHFZZ6SdaLq7HEi8XTzKmUifinZgU9hZb8WYIDIU/edit?usp=sharing)
 - [Miscellaneous](https://docs.google.com/spreadsheets/d/1_i_tN719jseXvPqpufLW8pTfEgDY5CpTRw9B14Sxewc/edit?usp=sharing)
 
+There are many variables in each of the files. Common variables acorss each file are: Song Name, Artist, Album, Hours (or some form of this), Play Count (or some form of this). Other variables are Date Added, Max Rank, Hour Differential, Play Differential, Total (all-time) Hours, Total (all-time) Plays, and others. There are currently more than 2000 songs in the database, and more are added each month.
 
 ## Short Project Description
 
