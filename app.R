@@ -8,10 +8,11 @@
 #
 
 library(shiny)
+library(shinythemes)
 library(tidyverse)
 
 
-cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
+cleaned <- readr::read_csv("data/cleanedpt1.csv")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(

@@ -57,3 +57,14 @@ We want to make an R Shiny app to access, analyze, and explore the various data 
 Molly Creagar
 
 Charlie Bonk
+
+
+<details>
+<summary><span> To understand exactly how 'Math Day 2020' came to be... </span></summary>
+<details>
+<summary><span> Warning. It says a bad word. </span></summary>
+<br>
+![JackBox is cool.](images/imsorry.png)
+</details>
+</details>
+

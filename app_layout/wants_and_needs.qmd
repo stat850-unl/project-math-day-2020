@@ -1,0 +1,96 @@
+---
+title: "General Notes on Project"
+format: html
+---
+
+# The List
+
+Here are all of the things that the owner of the dataset asked of the app.
+
+He has them grouped on what major group they fall into, and then has ranked them 1 through 5 on how important to him they are.
+
+## Songs (Overall):
+
+-   Filters (e.g., Most Time Improved, Most Play  -   Improved, Most Rank Improved, Most Value Improved, Most Time/Rank Improved from a given month) (1)
+-   Rank (e.g., Top 10, Top 20, etc) (2)
+-   Total (Greater than 100 hours, greater than 1000 plays, etc) (2)
+-   Date Added (On, Before, After) along with sorting filter items by date info (2)
+-   Other (e.g., Filters by artists, albums, etc) (3)
+
+## Bourgeoisie:
+
+-   Songs with Most Bourgeoisie, Longest Streak, Longest Current Streak, Highest %, Highest % over Given Year Range (2)
+-   List of each month info about playlist (2)
+
+## Individual Song Data:
+
+-   Constant info (display song name, artist, etc) (4)
+-   Big 4 (Hours Listened, Number of Plays, Rank, Value) (1)
+-   Month and year added to database (2)
+-   Graphs of Big 4 Info Over Time (1)
+-   Longest Streak (3)
+-   Longest Non-Debut Streak (3)
+-   Highest Stats (Rank, \Delta hours, etc.) (2)
+
+## Artists (Overall):
+
+-   Filters (e.g., Most Time Improved, Most Play Improved, Most Rank Improved, Most Value Improved, Most Time/Rank Improved from a given month) (1)
+-   Rank (e.g., Top 10, Top 20, etc) (2)
+-   Total (Greater than 100 hours, greater than 1000 plays, etc) (2)
+-   Date Added (On, Before, After) along with sorting filter items by date info (3)
+-   Other (e.g., Filters by artists, albums, etc) (3)
+
+## Individual Artist Data:
+
+-   Constant info (display artist name, number of songs, etc) (3)
+-   Big 4 (Hours Listened, Number of Songs, Rank, Value) (1)
+-   Month and Year added to database (4)
+-   Graphs of Big 4 Info Over Time (1)
+-   Longest Streak (5)
+-   Longest Non-Debut Streak (5)
+-   Highest Stats (Rank, \Delta hours, etc.) (2)
+
+---
+
+## 1 For The Money
+
+- [ ]   Filters (e.g., Most Time Improved, Most Play - Improved, Most Rank Improved, Most Value Improved, Most Time/Rank Improved from a given month) **SONGS: OVERALL**
+- [ ]   Big 4 (Hours Listened, Number of Plays, Rank, Value) **INDIVIDUAL SONG DATA**
+- [ ]   Graphs of Big 4 Info Over Time **INDIVIDUAL SONG DATA**
+- [ ]   Filters (e.g., Most Time Improved, Most Play Improved, Most Rank Improved, Most Value Improved, Most Time/Rank Improved from a given month) **ARTISTS: OVERALL**
+- [ ]   Big 4 (Hours Listened, Number of Songs, Rank, Value) **INDIVIDUAL ARTIST DATA**
+- [ ]   Graphs of Big 4 Info Over Time **INDIVIDUAL ARTIST DATA**
+
+## 2 For The Show
+- [ ]   Rank (e.g., Top 10, Top 20, etc) **SONGS: OVERALL**
+- [ ]   Total (Greater than 100 hours, greater than 1000 plays, etc) **SONGS: OVERALL**
+- [ ]   Date Added (On, Before, After) along with sorting filter items by date info **SONGS:OVERALL**
+- [ ]   Songs with Most Bourgeoisie, Longest Streak, Longest Current Streak, Highest %, Highest % over Given Year Range **BOURGEOISIE**
+- [ ]   List of each month info about playlist **BOURGEOISIE**
+- [ ]   Month and year added to database **INDIVIDUAL SONG DATA**
+- [ ]   Highest Stats (Rank, hours, etc.) **INDIVIDUAL SONG DATA**
+- [ ]   Rank (e.g., Top 10, Top 20, etc) **ARTISTS: OVERALL**
+- [ ]   Total (Greater than 100 hours, greater than 1000 plays, etc) **ARTISTS: OVERALL**
+- [ ]   Highest Stats (Rank, hours, etc.) **INDIVIDUAL ARTIST DATA**
+
+## 3 To Get Ready
+
+- [ ]   Other (e.g., Filters by artists, albums, etc) **SONGS OVERALL**
+- [ ]   Longest Streak **INDIVIDUAL SONG DATA**
+- [ ]   Longest Non-Debut Streak **INDIVIDUAL SONG DATA**
+- [ ]   Date Added (On, Before, After) along with sorting filter items by date info **ARTISTS OVERALL**
+- [ ]   Other (e.g., Filters by artists, albums, etc) **ARTISTS OVERALL**
+- [ ]   Constant info (display artist name, number of songs, etc) **INDIVIDUAL ARTIST DATA**
+
+## 4 To Go
+
+- [ ]   Constant info (display song name, artist, etc) **INDIVIDUAL SONG DATA**
+- [ ]   Month and Year added to database **INDIVIDUAL ARTIST DATA**
+
+## And 5. 
+
+- [ ]   Longest Streak **INDIVIDUAL ARTIST DATA**
+- [ ]   Longest Non-Debut Streak **INDIVIDUAL ARTIST DATA**
+
+---
+This will be used to help create an outline of what the User Interface in the Shiny App will look like.
