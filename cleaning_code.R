@@ -1,7 +1,7 @@
 library(tidyverse)
 library(dplyr)
 # this is a csv file containing the monthnames
-monthnames <- read.csv("~/Downloads/months.csv", header = TRUE)
+monthnames <- read.csv("~/Downloads/months.csv", header = TRUE, na = c("NA NA NA"))
 # this is a subset of the data (only 300 rows instead of >2000)
 # Using read_csv and specific column types ensures types are standardized and can be pivoted
 
@@ -46,7 +46,7 @@ db_partial3 <- db_partial[601:900,]
 db_partial4 <- db_partial[901:ncol(db_partial),]
 
 
-cleaned4 <- db_partial4 %>%
+cleaned1 <- db_partial1 %>%
   # Get rid of name column, ugh.
   select(-matches("SongName")) %>%
   # Very long form
@@ -71,7 +71,7 @@ cleaned <- rbind(cleaned1, cleaned2, cleaned3, cleaned4)
 cleaned <- left_join(cleaned, db_partial_names, by = "SongID")
 colnames(cleaned)[colnames(cleaned) == 'SongName.108'] <- 'SongName'
 
-
+write_csv(cleaned, '~/Downloads/cleaned.csv')
 
 
 

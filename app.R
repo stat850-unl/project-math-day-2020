@@ -12,7 +12,7 @@ library(shinythemes)
 library(tidyverse)
 
 
-cleaned <- readr::read_csv("data/cleanedpt1.csv")
+cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -37,7 +37,8 @@ server <- function(input, output) {
   
   cln_subset <- reactive({
     cleaned %>%
-      filter(SongName == input$song_name)
+      filter(SongName == input$song_name) %>%
+      mutate(datenum=as.Date(dates, format = "%B %d %Y"))
   })
   
  # output$dist <- renderPlot({
