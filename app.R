@@ -28,7 +28,9 @@ ui <- fluidPage(
     
     mainPanel(
       #plotOutput("dist")
-      tableOutput("dist")
+      tableOutput("dist"),
+      plotOutput("dateTimeListen"),
+      plotOutput("dateTimeListenNC")
     )
   )
 )
@@ -41,17 +43,29 @@ server <- function(input, output) {
       mutate(datenum=as.Date(dates, format = "%B %d %Y"))
   })
   
- # output$dist <- renderPlot({
- #   cln_subset() %>%
-  #    select(dates, TimeInHours, TimeInPlays) %>%
-  #    ggplot(aes(x = dates, y = TimeInHours)) +
-  #    geom_point()
-    
- # })
+
   output$dist <- renderTable({
     cln_subset() %>%
-      select(dates, TimeInHours, TimeInPlays)
-    
+      select(dates, TimeInHours, TimeInPlays) %>%
+      filter(!is.na(TimeInHours))
+  })
+  
+  output$dateTimeListen <- renderPlot({
+     cln_subset() %>%
+     select(datenum, TimeInHours) %>%
+      filter(!is.na(TimeInHours)) %>%
+      ggplot(aes(x = datenum, y = TimeInHours)) +
+      geom_point() +
+      labs(x = "Date", y = "Cumulative Hours Listened")
+    })
+  
+  output$dateTimeListenNC <- renderPlot({
+    cln_subset() %>%
+      select(datenum, dHours) %>%
+      filter(!is.na(dHours)) %>%
+      ggplot(aes(x = datenum, y = dHours)) +
+      geom_line() +
+      labs(x = "Date", y = "Hours Listened By Date")
   })
 }
 
