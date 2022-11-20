@@ -8,16 +8,20 @@ monthnames <- read.csv("~/Downloads/months.csv", header = TRUE, na = c("NA NA NA
 ## NOTE: this is hard coded. need to fix 1416 to ncol(dbpartial)
 # Specifying an NA character helps with typing as well
 #db_partial <- read_csv("~/Downloads/partial_song_data.csv", col_types = ctypes, na = "-")
-db_partial <- read_csv("~/Downloads/dbtest.csv",col_types = inittypes, na = c('-', 'NA'))
+
+
 inittypes <- rep("cnnnnnnnnnnnn", times = ((1433-12)/13))
 
+db_partial <- read_csv("~/Downloads/dbtest.csv",col_types = inittypes, na = c('-', 'NA'))
+
 db_intro_rows <- read_csv("~/Downloads/dbtestn.csv",col_types = 'nnn', na = c('-', 'NA'))
+
+db_songs_info <- read_csv("~/Downloads/saam_info.csv", col_types = 'nccc', na = 'NA')
 
 
 db_partial <- cbind(db_intro_rows, db_partial)
 
-db_partial_names <- db_partial %>%
-  select("SongName.108", "SongID")
+
 
 # Better to just use the .X names so that you have a more sure way to know how many times the variable name has been repeated
 # colrepnames <- c("SongName", "TimeInHours",	"TimeInPlays",	"RankOutOfN",	"ValueOutOf1",
@@ -65,13 +69,100 @@ cleaned1 <- db_partial1 %>%
   pivot_wider(id_cols = c(1:3, dates), names_from = "var", values_from = "value")
 
 
+
+cleaned1 <- db_partial1 %>%
+  # Get rid of name column, ugh.
+  select(-matches("SongName")) %>%
+  # Very long form
+  pivot_longer(cols = -c(1:3), names_to = "variable", values_to = "value") %>%
+  # Use same strategy to separate variables into # times they're repeated
+  separate(variable, into = c("var", "rep"), sep = "\\.") %>%
+  # Replace NAs with 0 -- first time the variable has appeared
+  mutate(rep = ifelse(is.na(rep), 0, as.numeric(rep))) %>%
+  # This isn't strictly necessary but makes all blocks of variable/month combos consistent
+  mutate(rep = ifelse(grepl("Total", var), rep + 1, rep)) %>%
+  # Merge
+  left_join(select(monthnames, dates, var, rep)) %>%
+  # Rep is now redundant information
+  select(-rep) %>%
+  # Pivot wider using cleaned variable names
+  pivot_wider(id_cols = c(1:3, dates), names_from = "var", values_from = "value")
+
+
+
+cleaned2 <- db_partial2 %>%
+  # Get rid of name column, ugh.
+  select(-matches("SongName")) %>%
+  # Very long form
+  pivot_longer(cols = -c(1:3), names_to = "variable", values_to = "value") %>%
+  # Use same strategy to separate variables into # times they're repeated
+  separate(variable, into = c("var", "rep"), sep = "\\.") %>%
+  # Replace NAs with 0 -- first time the variable has appeared
+  mutate(rep = ifelse(is.na(rep), 0, as.numeric(rep))) %>%
+  # This isn't strictly necessary but makes all blocks of variable/month combos consistent
+  mutate(rep = ifelse(grepl("Total", var), rep + 1, rep)) %>%
+  # Merge
+  left_join(select(monthnames, dates, var, rep)) %>%
+  # Rep is now redundant information
+  select(-rep) %>%
+  # Pivot wider using cleaned variable names
+  pivot_wider(id_cols = c(1:3, dates), names_from = "var", values_from = "value")
+
+
+
+cleaned3 <- db_partial3 %>%
+  # Get rid of name column, ugh.
+  select(-matches("SongName")) %>%
+  # Very long form
+  pivot_longer(cols = -c(1:3), names_to = "variable", values_to = "value") %>%
+  # Use same strategy to separate variables into # times they're repeated
+  separate(variable, into = c("var", "rep"), sep = "\\.") %>%
+  # Replace NAs with 0 -- first time the variable has appeared
+  mutate(rep = ifelse(is.na(rep), 0, as.numeric(rep))) %>%
+  # This isn't strictly necessary but makes all blocks of variable/month combos consistent
+  mutate(rep = ifelse(grepl("Total", var), rep + 1, rep)) %>%
+  # Merge
+  left_join(select(monthnames, dates, var, rep)) %>%
+  # Rep is now redundant information
+  select(-rep) %>%
+  # Pivot wider using cleaned variable names
+  pivot_wider(id_cols = c(1:3, dates), names_from = "var", values_from = "value")
+
+
+
+cleaned4 <- db_partial4 %>%
+  # Get rid of name column, ugh.
+  select(-matches("SongName")) %>%
+  # Very long form
+  pivot_longer(cols = -c(1:3), names_to = "variable", values_to = "value") %>%
+  # Use same strategy to separate variables into # times they're repeated
+  separate(variable, into = c("var", "rep"), sep = "\\.") %>%
+  # Replace NAs with 0 -- first time the variable has appeared
+  mutate(rep = ifelse(is.na(rep), 0, as.numeric(rep))) %>%
+  # This isn't strictly necessary but makes all blocks of variable/month combos consistent
+  mutate(rep = ifelse(grepl("Total", var), rep + 1, rep)) %>%
+  # Merge
+  left_join(select(monthnames, dates, var, rep)) %>%
+  # Rep is now redundant information
+  select(-rep) %>%
+  # Pivot wider using cleaned variable names
+  pivot_wider(id_cols = c(1:3, dates), names_from = "var", values_from = "value")
+
+
 cleaned <- rbind(cleaned1, cleaned2, cleaned3, cleaned4)
 
 
-cleaned <- left_join(cleaned, db_partial_names, by = "SongID")
-colnames(cleaned)[colnames(cleaned) == 'SongName.108'] <- 'SongName'
+cleaned <- left_join(cleaned, db_songs_info, by = "SongID")
+
 
 write_csv(cleaned, '~/Downloads/cleaned.csv')
+
+
+
+
+
+
+
 
 
 

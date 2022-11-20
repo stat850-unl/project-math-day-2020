@@ -23,7 +23,7 @@ ui <- fluidPage(
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-      selectInput("song_name", "Song Name", choices = sort(unique(cleaned$SongName)), selected = "Hey, Soul Sister")
+      selectInput("song_name", "Song Name", choices = sort(unique(cleaned$SongName)), selected = "Instant Crush (feat. Julian Casablancas)")
     ),
     
     mainPanel(
@@ -59,7 +59,7 @@ server <- function(input, output) {
       labs(x = "Date", y = "Cumulative Hours Listened")
     })
   
-  output$dateTimeListenNC <- renderPlot({
+  output$dateTimeListenNC <- renderPlot({ #non-cumulative listening hours
     cln_subset() %>%
       select(datenum, dHours) %>%
       filter(!is.na(dHours)) %>%
