@@ -23,19 +23,21 @@ ui <- fluidPage(
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-      selectInput("song_name", "Song Name", choices = sort(unique(cleaned$SongName)), selected = "Instant Crush (feat. Julian Casablancas)")
+      selectizeInput("song_name", "Song Name", choices = sort(unique(cleaned$SongName)), selected = "Instant Crush (feat. Julian Casablancas)", options = list(maxOptions = 10))
     ),
     
     mainPanel(
       #plotOutput("dist")
       tableOutput("info"),
+      tableOutput("big4"),
       plotOutput("dateTimeListen"),
       plotOutput("dateTimeListenNC")
     )
   )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
   
   cln_subset <- reactive({
     cleaned %>%
@@ -51,12 +53,23 @@ server <- function(input, output) {
  
   })
   
+  cln_big_4 <- reactive({
+    cleaned %>%
+      filter(SongName == input$song_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      slice_tail(n=1)
+  })
   
   
 
   output$info <- renderTable({
     cln_subset_overall_info() %>%
      select(MaximumRank, TotalHoursListened, TotalPlays, ArtistName, AlbumName)
+  })
+  
+  output$big4 <- renderTable({
+    cln_big_4() %>%
+      select(RankOutOfN, ValueOutOf1, TimeInHours,TimeInPlays)
   })
   
   output$dateTimeListen <- renderPlot({
