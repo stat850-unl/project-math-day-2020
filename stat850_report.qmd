@@ -1,0 +1,23 @@
+---
+title: "Creating a Music Database with User-Friendly Interface via Shiny"
+author: Charlie Bonk and Molly Creagar
+format: html
+---
+
+## Abstract:
+
+### Keywords:
+
+## Introduction
+
+
+## Data Description
+
+
+## Methods and Analysis
+
+
+## Discussion
+
+
+## Appendix
