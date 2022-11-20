@@ -28,7 +28,7 @@ ui <- fluidPage(
     
     mainPanel(
       #plotOutput("dist")
-      tableOutput("dist"),
+      tableOutput("info"),
       plotOutput("dateTimeListen"),
       plotOutput("dateTimeListenNC")
     )
@@ -43,11 +43,20 @@ server <- function(input, output) {
       mutate(datenum=as.Date(dates, format = "%B %d %Y"))
   })
   
+  cln_subset_overall_info <- reactive({
+    cleaned %>%
+      filter(SongName == input$song_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      summarize(MaximumRank = max(MaxRank), TotalHoursListened = max(TimeInHours), TotalPlays = max(TimeInPlays), ArtistName = unique(Artist), AlbumName = unique(Album))
+ 
+  })
+  
+  
+  
 
-  output$dist <- renderTable({
-    cln_subset() %>%
-      select(dates, TimeInHours, TimeInPlays) %>%
-      filter(!is.na(TimeInHours))
+  output$info <- renderTable({
+    cln_subset_overall_info() %>%
+     select(MaximumRank, TotalHoursListened, TotalPlays, ArtistName, AlbumName)
   })
   
   output$dateTimeListen <- renderPlot({
