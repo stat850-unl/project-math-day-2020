@@ -14,31 +14,71 @@ library(tidyverse)
 
 cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- fluidPage(
   
+  navbarPage(
   # Application title
-  titlePanel("Song Data"),
+    title = "SAAM",
   
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
+  # Sidebar tabs
+  tabPanel(
+    "Songs",
+    
+    tabsetPanel(
+      
+      type = "tabs",
+      
+      
+      tabPanel(
+        
+        "Individual Song Data",
+        
     sidebarPanel(
       selectizeInput("song_name", "Song Name", choices = sort(unique(cleaned$SongName)), selected = "Instant Crush (feat. Julian Casablancas)", options = list(maxOptions = 10))
     ),
     
     mainPanel(
-      #plotOutput("dist")
-      tableOutput("info"),
-      tableOutput("big4"),
+      tableOutput("song_info"),
+      tableOutput("song_big4"),
       plotOutput("dateTimeListen"),
       plotOutput("dateTimeListenNC")
     )
   )
+      )
+    ),
+  
+  
+  # Second big tab
+  tabPanel(
+    "Artists",
+    
+    tabsetPanel(
+      
+      type = "tabs",
+      
+      
+      tabPanel(
+        
+        "Individual Artist Data",
+        
+        sidebarPanel(
+          selectizeInput("artist_name", "Artist", choices = sort(unique(cleaned$Artist)), selected = "Daft Punk", options = list(maxOptions = 10))
+        ),
+        
+        mainPanel(
+          tableOutput("artist_info")
+        )
+      )
+    )
+  )
+)
 )
 
 server <- function(input, output, session) {
   
   
+  ## SONGS
   cln_subset <- reactive({
     cleaned %>%
       filter(SongName == input$song_name) %>%
@@ -53,7 +93,7 @@ server <- function(input, output, session) {
  
   })
   
-  cln_big_4 <- reactive({
+  cln_big_4_song <- reactive({
     cleaned %>%
       filter(SongName == input$song_name) %>%
       filter(!is.na(TimeInHours)) %>%
@@ -62,13 +102,13 @@ server <- function(input, output, session) {
   
   
 
-  output$info <- renderTable({
+  output$song_info <- renderTable({
     cln_subset_overall_info() %>%
      select(MaximumRank, TotalHoursListened, TotalPlays, ArtistName, AlbumName)
   })
   
-  output$big4 <- renderTable({
-    cln_big_4() %>%
+  output$song_big4 <- renderTable({
+    cln_big_4_song() %>%
       select(RankOutOfN, ValueOutOf1, TimeInHours,TimeInPlays)
   })
   
@@ -89,6 +129,38 @@ server <- function(input, output, session) {
       geom_line() +
       labs(x = "Date", y = "Hours Listened By Date")
   })
+  
+  
+  
+  ### ARTISTS
+  
+  cln_artist_subset <- reactive({
+    cleaned %>%
+      filter(Artist == input$artist_name) %>%
+      mutate(datenum=as.Date(dates, format = "%B %d %Y"),
+             MaxRank = as.integer(MaxRank))
+  })
+  
+  cln_artist_overall_info <- reactive({
+    cleaned %>%
+      filter(Artist == input$artist_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      mutate(MaxRank = as.integer(MaxRank))
+  
+    
+  })
+  
+
+  
+  output$artist_info <- renderTable({
+      cln_artist_overall_info() %>%
+      select(SongName, Album, MaxRank) %>%
+      group_by(SongName, Album, MaxRank) %>%
+      summarise()
+
+  })
+  
+  
 }
 
 # Run the application 
