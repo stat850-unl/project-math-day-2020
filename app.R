@@ -15,7 +15,7 @@ library(tidyverse)
 cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
 
 # Define UI for application
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("flatly"),
   
   navbarPage(
   # Application title
@@ -29,6 +29,19 @@ ui <- fluidPage(
       
       type = "tabs",
       
+      
+      tabPanel(
+        
+        "Overall Song Data",
+        
+        sidebarPanel(
+          sliderInput("topPlayed", "Hours", min = 0, max = 200, value = 100)
+        ),
+        
+        mainPanel(
+          tableOutput("play_info")
+        )
+      ),
       
       tabPanel(
         
@@ -71,7 +84,33 @@ ui <- fluidPage(
         )
       )
     )
+  ),
+
+
+tabPanel(
+  "Albums",
+  
+  tabsetPanel(
+    type = "tabs",
+    tabPanel(
+      "Album Info"
+    )
   )
+),
+
+
+tabPanel(
+  "Miscellaneous",
+  
+  tabsetPanel(
+    type = "tabs",
+    
+    tabPanel(
+      "Bourgeoisie by Month"
+      
+    )
+  )
+)
 )
 )
 
@@ -79,6 +118,12 @@ server <- function(input, output, session) {
   
   
   ## SONGS
+  subset_plays <- reactive({
+    cleaned %>%
+      filter(!is.na(TimeInHours),
+             TimeInHours >= input$topPlayed)
+  })
+  
   cln_subset <- reactive({
     cleaned %>%
       filter(SongName == input$song_name) %>%
@@ -118,7 +163,7 @@ server <- function(input, output, session) {
       filter(!is.na(TimeInHours)) %>%
       ggplot(aes(x = datenum, y = TimeInHours)) +
       geom_point() +
-      labs(x = "Date", y = "Cumulative Hours Listened")
+      labs(x = "Date", y = "Cumulative Hours Listened", title="Cumulative Hours Listened")
     })
   
   output$dateTimeListenNC <- renderPlot({ #non-cumulative listening hours
@@ -127,7 +172,14 @@ server <- function(input, output, session) {
       filter(!is.na(dHours)) %>%
       ggplot(aes(x = datenum, y = dHours)) +
       geom_line() +
-      labs(x = "Date", y = "Hours Listened By Date")
+      labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date Added")
+  })
+  
+  output$play_info <- renderTable({
+   subset_plays() %>%
+      select(SongName, Artist, TimeInHours) %>%
+      group_by(SongName) %>%
+      summarise(TotalTime = max(TimeInHours))
   })
   
   
@@ -155,10 +207,12 @@ server <- function(input, output, session) {
   output$artist_info <- renderTable({
       cln_artist_overall_info() %>%
       select(SongName, Album, MaxRank) %>%
-      group_by(SongName, Album, MaxRank) %>%
+      group_by(SongName) %>%
       summarise()
 
   })
+  
+
   
   
 }
