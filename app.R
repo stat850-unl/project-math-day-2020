@@ -37,7 +37,7 @@ ui <- fluidPage(
                    "Hours",
                    min = 0,
                    max = 200,
-                   value = c(0,70)
+                   value = c(0, 70)
                  )),
                  
                  mainPanel(tableOutput("play_info"))
@@ -86,37 +86,54 @@ ui <- fluidPage(
                    )
                  ),
                  
-                 mainPanel(tableOutput("artist_info"))
+                 mainPanel(tableOutput("artist_info"),
+                           plotOutput("artist_plot"))
                )
              )),
     
     
-    tabPanel("Albums",
-             
-             tabsetPanel(type = "tabs",
-                         tabPanel("Album Info"))),
     
-    
-    tabPanel("Miscellaneous",
-             
-             tabsetPanel(type = "tabs",
+    tabPanel( "Albums",
+          tabsetPanel(       
+            type = "tabs",
+                tabPanel(
+                  "Album Info",
+                  sidebarPanel(
+                    selectizeInput(
+                      "album_name",
+                      "Album",
+                      choices = sort(unique(cleaned$Album)),
+                      selected = "21st Century Breakdown",
+                      options = list(maxOptions = 10)
+                    )
+                  ),
+                  
+                  mainPanel(tableOutput("album_info"))
+                ))
+  ),
+  
+  
+  tabPanel("Miscellaneous",
+           
+           tabsetPanel(type = "tabs",
+                       
+                       tabPanel(
+                         "Bourgeoisie by Month"
                          
-                         tabPanel(
-                           "Bourgeoisie by Month"
-                           
-                         )))
-  )
-)
+                       )))
+  
+))
 
 server <- function(input, output, session) {
-  
   ###### SONGS ###########
   
   subset_plays <- reactive({
     cleaned %>%
-      filter(!is.na(TimeInHours),
-             TimeInHours >= input$topPlayed[1],
-             TimeInHours <= input$topPlayed[2])
+      filter(
+        !is.na(TimeInHours),
+        TimeInHours >= input$topPlayed[1],
+        TimeInHours <= input$topPlayed[2]
+      )
   })
   
   cln_subset <- reactive({
@@ -186,35 +203,53 @@ server <- function(input, output, session) {
   
   cln_artist_subset <- reactive({
     cleaned %>%
-      filter(Artist == input$artist_name) %>%
+      filter(Artist == input$artist_name,
+             !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
   })
   
-  cln_artist_overall_info <- reactive({
-    cleaned %>%
-      filter(Artist == input$artist_name) %>%
-      filter(!is.na(TimeInHours)) %>%
-      mutate(MaxRank = as.integer(MaxRank))
-    
+
+  
+  output$artist_info <- renderTable({
+    cln_artist_subset() %>%
+      select(SongName, Album, MaxRank) %>%
+      group_by(SongName,Album, MaxRank) %>%
+      summarise()
     
   })
   
-  
-  
-  output$artist_info <- renderTable({
-    cln_artist_overall_info() %>%
-      select(SongName, Album, MaxRank) %>%
-      group_by(SongName) %>%
-      summarise()
-    
+  output$artist_plot <- renderPlot({
+    cln_artist_subset() %>%
+      select(datenum, TimeInHours) %>%
+      group_by(datenum) %>%
+      summarize(TotalTime = sum(TimeInHours)) %>%
+      ggplot(aes(x = datenum, y = TotalTime)) + 
+      geom_line() + 
+      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened by Artist")
   })
   
   
   ########## ALBUMS #############
   
   
+  cln_album_subset <- reactive({
+    cleaned %>%
+      filter(Album == input$album_name,!is.na(TimeInHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"),
+             MaxRank = as.integer(MaxRank))
+  })
   
+  
+  
+  
+  output$album_info <- renderTable({
+    cln_album_subset() %>%
+      select(SongName, Artist, MaxRank) %>%
+      group_by(SongName, Artist, MaxRank) %>%
+      summarise()
+    
+  })
   
   
   
