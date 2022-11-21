@@ -80,6 +80,22 @@ ui <- fluidPage(
              tabsetPanel(
                type = "tabs",
                
+               tabPanel(
+                 "Overall Artist Data",
+                 
+                 sidebarPanel(
+                   sliderInput(
+                     "topArtistHrs",
+                     "Hours",
+                     min = 0,
+                     max = 2000,
+                     value = c(0, 100)
+                   )
+                   
+                 ),
+                 mainPanel(tableOutput("artist_play_info"))
+                 
+               ),
                
                tabPanel(
                  "Individual Artist Data",
@@ -241,6 +257,36 @@ server <- function(input, output, session) {
   
   ########## ARTISTS #############
   
+  subset_artist_plays <- reactive({
+    
+    Artist_by_SongID <- cleaned %>%
+      select(SongID, Artist)
+    
+    
+    tb <- cleaned %>%
+      group_by(SongID, TimeInHours) %>%
+      filter(!is.na(TimeInHours)) %>%
+      summarize(n = n()) %>%
+      group_by(SongID) %>%
+      slice(which.max(n)) %>%
+      rename(TotalTimeInHoursbySong = TimeInHours)
+    
+    Artist_Plays <- left_join(tb, Artist_by_SongID, by = "SongID")
+    
+    tb <- Artist_Plays %>%
+      distinct() %>%
+      group_by(Artist) %>%
+      mutate(TotalTimeInHours = sum(TotalTimeInHoursbySong))
+      
+    tb %>%
+      select(Artist, TotalTimeInHours) %>%
+      filter(TotalTimeInHours >= input$topArtistHrs[1],
+             TotalTimeInHours <= input$topArtistHrs[2]) %>%
+      arrange(desc(TotalTimeInHours)) %>%
+      distinct()
+      
+  })
+  
   cln_artist_subset <- reactive({
     cleaned %>%
       filter(Artist == input$artist_name,
@@ -249,7 +295,10 @@ server <- function(input, output, session) {
              MaxRank = as.integer(MaxRank))
   })
   
-
+  output$artist_play_info <- renderTable({
+   subset_artist_plays()
+   
+  })
   
   output$artist_info <- renderTable({
     cln_artist_subset() %>%
