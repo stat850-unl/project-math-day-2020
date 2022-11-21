@@ -1,0 +1,20 @@
+---
+title: "Creating a Music Database with User-Friendly Interface via Shiny"
+author: "Charlie Bonk and Molly Creagar"
+format: revealjs
+output:
+  html_document:
+    self-contained: true
+---
+
+## Introduction
+
+
+## Data Description
+
+
+## Methods and Analysis
+
+
+## Discussion
+
