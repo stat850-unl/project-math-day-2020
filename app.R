@@ -10,6 +10,7 @@
 library(shiny)
 library(shinythemes)
 library(tidyverse)
+library(patchwork)
 
 
 cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
@@ -33,11 +34,18 @@ ui <- fluidPage(
                  "Overall Song Data",
                  
                  sidebarPanel(sliderInput(
-                   "topPlayed",
+                   "topHrs",
                    "Hours",
                    min = 0,
                    max = 200,
                    value = c(0, 70)
+                 ), 
+                 sliderInput(
+                   "topPlayed",
+                   "Plays",
+                   min = 0,
+                   max = 2500,
+                   value = c(0, 100)
                  )),
                  
                  mainPanel(tableOutput("play_info"))
@@ -131,8 +139,10 @@ server <- function(input, output, session) {
     cleaned %>%
       filter(
         !is.na(TimeInHours),
-        TimeInHours >= input$topPlayed[1],
-        TimeInHours <= input$topPlayed[2]
+        TimeInHours >= input$topHrs[1],
+        TimeInHours <= input$topHrs[2],
+        TimeInPlays >= input$topPlayed[1],
+        TimeInPlays <= input$topPlayed[2]
       )
   })
   
@@ -157,9 +167,9 @@ server <- function(input, output, session) {
   # overall
   output$play_info <- renderTable({
     subset_plays() %>%
-      select(SongName, Artist, TimeInHours) %>%
+      select(SongName, Artist, TimeInHours, TimeInPlays) %>%
       group_by(SongName) %>%
-      summarise(TotalTime = max(TimeInHours)) %>%
+      summarise(TotalTime = max(TimeInHours), TotalPlays = max(TimeInPlays)) %>%
       arrange(desc(TotalTime))
   })
   
@@ -176,14 +186,44 @@ server <- function(input, output, session) {
       select(RankOutOfN, ValueOutOf1, TimeInHours, TimeInPlays)
   })
   
+
+  
   output$dateTimeListen <- renderPlot({
-    cln_subset() %>%
+    
+    p1 <- cln_subset() %>%
       select(datenum, TimeInHours) %>%
       filter(!is.na(TimeInHours)) %>%
       ggplot(aes(x = datenum, y = TimeInHours)) +
-      geom_point() +
-      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened")
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+    
+    
+    p2 <- cln_subset() %>%
+      select(datenum, TimeInPlays) %>%
+      filter(!is.na(TimeInPlays)) %>%
+      ggplot(aes(x = datenum, y = TimeInPlays)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Song Over Time")
+    
+    p3 <-  cln_subset() %>%
+      select(datenum, RankOutOfN) %>%
+      filter(!is.na(RankOutOfN)) %>%
+      ggplot(aes(x = datenum, y = RankOutOfN)) +
+      geom_line() +
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
+      
+    p4 <-  cln_subset() %>%
+      select(datenum, ValueOutOf1) %>%
+      filter(!is.na(ValueOutOf1)) %>%
+      ggplot(aes(x = datenum, y = ValueOutOf1)) +
+      geom_line() +
+      labs(x = "Date", y = "Song Value", title = "Overal Value of the Song Over Time")
+    
+    
+    p3 + p4 + p1 + p2
   })
+  
+
   
   output$dateTimeListenNC <-
     renderPlot({
