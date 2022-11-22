@@ -13,8 +13,8 @@ library(tidyverse)
 library(patchwork)
 
 
-cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
-cleaned_artist <- readr::read_csv("~/Downloads/cleaned_artist.csv")
+cleaned <- readr::read_csv("data/cleaned.csv")
+#cleaned_artist <- readr::read_csv("~/Downloads/cleaned_artist.csv")
 
 # Define UI for application
 ui <- fluidPage(
