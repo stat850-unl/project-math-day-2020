@@ -117,8 +117,10 @@ ui <- fluidPage(
                    )
                  ),
                  
-                 mainPanel(tableOutput("artist_song_info"),
-                           plotOutput("artist_big4"))
+                 mainPanel(tableOutput("overall_artist_info"),
+                          tableOutput("artist_song_info"),
+                           plotOutput("artist_big4"),
+                           plotOutput("dateTimeListenNCA"))
                )
              )),
     
@@ -290,7 +292,17 @@ server <- function(input, output, session) {
       filter(Artist == input$artist_name,
              !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
-             MaxRank = as.integer(MaxRank))
+             MaxRank = as.integer(MaxRank)) 
+  })
+  
+  cln_artist_overall_info <- reactive({
+    cleaned_artist %>%
+      filter(Artist == input$artist_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      summarize(
+        MaximumRank = as.integer(max(MaxRank)),
+        SongCount = as.integer(max(SongCount))
+      )
   })
   
   
@@ -311,6 +323,12 @@ server <- function(input, output, session) {
       summarise()
     
   })
+  
+  output$overall_artist_info <- renderTable({
+    cln_artist_overall_info() %>%
+      select(MaximumRank, SongCount)
+  })
+  
   
   output$artist_big4 <- renderPlot({
     p1a <- cln_artist_subset() %>%
@@ -346,6 +364,17 @@ server <- function(input, output, session) {
     p3a + p4a + p1a + p2a
   })
   
+  
+  output$dateTimeListenNCA <-
+    renderPlot({
+      #non-cumulative listening hours
+      cln_artist_subset() %>%
+        select(datenum, dHours) %>%
+        filter(!is.na(dHours)) %>%
+        ggplot(aes(x = datenum, y = dHours)) +
+        geom_line() +
+        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
+    })
 
   
   
