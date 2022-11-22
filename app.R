@@ -14,7 +14,7 @@ library(patchwork)
 
 
 cleaned <- readr::read_csv("data/cleaned.csv")
-#cleaned_artist <- readr::read_csv("~/Downloads/cleaned_artist.csv")
+cleaned_artist <- readr::read_csv("data/cleaned_artist.csv")
 
 # Define UI for application
 ui <- fluidPage(
@@ -345,8 +345,6 @@ server <- function(input, output, session) {
     
     p3a + p4a + p1a + p2a
   })
-  
-
   
 
   
