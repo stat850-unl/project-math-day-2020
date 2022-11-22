@@ -8,11 +8,36 @@ format: html
 
 ### Keywords:
 
+music database, shiny app, R
+
 ## Introduction
+
 
 
 ## Data Description
 
+The data consists of a collection of multiple Google sheets tracking one person's listening history. There are 1416 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though the 
+
+Variables recorded include: 
+
+- SongID (a unique identifying number), 
+- 24hrMark (the month after the data collection started when the song passed 24 hours of play time), 
+- MaxRank (the highest rank the song has ever achieved), 
+- dates (the date of the observation), 
+- TimeInHours (total time listened in hours), 
+- TimeInPlays (total time listened in plays), 
+- RankOutOfN (current rank of the song), ValueOutOf1 (scaled rank, with value 1 being best), 
+- dHours (change in hours listened from the previous observation), 
+- dPlays(change in plays from the previous observations), 
+- dRank, (change in rank from the previous observation), 
+- dValue (change in value from the previous observation), 
+- TotaldTime (total change in hours from the first observation of the song), 
+- TotaldPlays (total change in plays from the first observation of the song), 
+- TotaldRank (total change in rank from the first observation of the song), 
+- TotaldValue (total change in value from the first observation of the song), 
+- SongName (name of the song), 
+- Artist (name of the artist), and 
+- Album (name of the album).
 
 ## Methods and Analysis
 
