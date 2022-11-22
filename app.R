@@ -89,7 +89,13 @@ ui <- fluidPage(
                      "topArtistHrs",
                      "Hours",
                      min = 0,
-                     max = 2000,
+                     max = 5000,
+                     value = c(0, 100)
+                   ), sliderInput(
+                     "topArtistPlayed",
+                     "Plays",
+                     min = 0,
+                     max = 30000,
                      value = c(0, 100)
                    )
                    
@@ -111,8 +117,8 @@ ui <- fluidPage(
                    )
                  ),
                  
-                 mainPanel(tableOutput("artist_info"),
-                           plotOutput("artist_plot"))
+                 mainPanel(tableOutput("artist_song_info"),
+                           plotOutput("artist_big4"))
                )
              )),
     
@@ -260,39 +266,28 @@ server <- function(input, output, session) {
   
   subset_artist_plays <- reactive({
     
-    #this currently uses the cleaned file (which is specific to songs); could be simplified a lot by using the artist file...
-    
-    Artist_by_SongID <- cleaned %>%
-      select(SongID, Artist)
-    
-    
-    tb <- cleaned %>%
-      group_by(SongID, TimeInHours) %>%
-      filter(!is.na(TimeInHours)) %>%
-      summarize(n = n()) %>%
-      group_by(SongID) %>%
-      slice(which.max(n)) %>%
-      rename(TotalTimeInHoursbySong = TimeInHours)
-    
-    Artist_Plays <- left_join(tb, Artist_by_SongID, by = "SongID")
-    
-    tb <- Artist_Plays %>%
-      distinct() %>%
-      group_by(Artist) %>%
-      mutate(TotalTimeInHours = sum(TotalTimeInHoursbySong))
+    cleaned_artist %>%
+      filter(
+        !is.na(TimeInHours),
+        TimeInHours >= input$topArtistHrs[1],
+        TimeInHours <= input$topArtistHrs[2],
+        TimeInPlays >= input$topArtistPlayed[1],
+        TimeInPlays <= input$topArtistPlayed[2]
+      )
       
-    tb %>%
-      select(Artist, TotalTimeInHours) %>%
-      filter(TotalTimeInHours >= input$topArtistHrs[1],
-             TotalTimeInHours <= input$topArtistHrs[2]) %>%
-      arrange(desc(TotalTimeInHours)) %>%
-      distinct()
-      
+  })
+  
+  cln_artist_by_song_info <- reactive({
+    cleaned %>%
+      filter(Artist == input$artist_name,
+             !is.na(TimeInHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"),
+             MaxRank = as.integer(MaxRank))
   })
   
   cln_artist_subset <- reactive({
     cleaned_artist %>%
-      filter(ArtistName == input$artist_name,
+      filter(Artist == input$artist_name,
              !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
@@ -301,12 +296,16 @@ server <- function(input, output, session) {
   
   
   output$artist_play_info <- renderTable({
-   subset_artist_plays()
+    subset_artist_plays() %>%
+      select(Artist, TimeInHours, TimeInPlays) %>%
+      group_by(Artist) %>%
+      summarise(TotalTime = max(TimeInHours), TotalPlays = max(TimeInPlays)) %>%
+      arrange(desc(TotalTime))
    
   })
   
-  output$artist_info <- renderTable({
-    cln_artist_subset() %>%
+  output$artist_song_info <- renderTable({
+    cln_artist_by_song_info() %>%
       select(SongName, Album, MaxRank) %>%
       group_by(SongName,Album, MaxRank) %>%
       summarise()
@@ -327,35 +326,27 @@ server <- function(input, output, session) {
       filter(!is.na(TimeInPlays)) %>%
       ggplot(aes(x = datenum, y = TimeInPlays)) +
       geom_line() +
-      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Song Over Time")
+      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Artist's Songs Over Time")
     
     p3a <-  cln_artist_subset() %>%
       select(datenum, RankOutOfN) %>%
       filter(!is.na(RankOutOfN)) %>%
       ggplot(aes(x = datenum, y = RankOutOfN)) +
       geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Artist Over Time")
     
     p4a <-  cln_artist_subset() %>%
       select(datenum, ValueOutOf1) %>%
       filter(!is.na(ValueOutOf1)) %>%
       ggplot(aes(x = datenum, y = ValueOutOf1)) +
       geom_line() +
-      labs(x = "Date", y = "Song Value", title = "Overall Value of the Song Over Time")
+      labs(x = "Date", y = "Artist Value", title = "Overall Value of the Artist Over Time")
     
     
     p3a + p4a + p1a + p2a
   })
   
-  # output$artist_plot <- renderPlot({
-  #   cln_artist_subset() %>%
-  #     select(datenum, TimeInHours) %>%
-  #     group_by(datenum) %>%
-  #     summarize(TotalTime = sum(TimeInHours)) %>%
-  #     ggplot(aes(x = datenum, y = TotalTime)) + 
-  #     geom_line() + 
-  #     labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened by Artist")
-  # })
+
   
 
   
