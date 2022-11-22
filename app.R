@@ -14,6 +14,7 @@ library(patchwork)
 
 
 cleaned <- readr::read_csv("~/Downloads/cleaned.csv")
+cleaned_artist <- readr::read_csv("~/Downloads/cleaned_artist.csv")
 
 # Define UI for application
 ui <- fluidPage(
@@ -233,7 +234,7 @@ server <- function(input, output, session) {
       filter(!is.na(ValueOutOf1)) %>%
       ggplot(aes(x = datenum, y = ValueOutOf1)) +
       geom_line() +
-      labs(x = "Date", y = "Song Value", title = "Overal Value of the Song Over Time")
+      labs(x = "Date", y = "Song Value", title = "Overall Value of the Song Over Time")
     
     
     p3 + p4 + p1 + p2
@@ -258,6 +259,8 @@ server <- function(input, output, session) {
   ########## ARTISTS #############
   
   subset_artist_plays <- reactive({
+    
+    #this currently uses the cleaned file (which is specific to songs); could be simplified a lot by using the artist file...
     
     Artist_by_SongID <- cleaned %>%
       select(SongID, Artist)
@@ -288,12 +291,14 @@ server <- function(input, output, session) {
   })
   
   cln_artist_subset <- reactive({
-    cleaned %>%
-      filter(Artist == input$artist_name,
+    cleaned_artist %>%
+      filter(ArtistName == input$artist_name,
              !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
   })
+  
+  
   
   output$artist_play_info <- renderTable({
    subset_artist_plays()
@@ -308,15 +313,51 @@ server <- function(input, output, session) {
     
   })
   
-  output$artist_plot <- renderPlot({
-    cln_artist_subset() %>%
+  output$artist_big4 <- renderPlot({
+    p1a <- cln_artist_subset() %>%
       select(datenum, TimeInHours) %>%
-      group_by(datenum) %>%
-      summarize(TotalTime = sum(TimeInHours)) %>%
-      ggplot(aes(x = datenum, y = TotalTime)) + 
-      geom_line() + 
-      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened by Artist")
+      filter(!is.na(TimeInHours)) %>%
+      ggplot(aes(x = datenum, y = TimeInHours)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+    
+    
+    p2a <- cln_artist_subset() %>%
+      select(datenum, TimeInPlays) %>%
+      filter(!is.na(TimeInPlays)) %>%
+      ggplot(aes(x = datenum, y = TimeInPlays)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Song Over Time")
+    
+    p3a <-  cln_artist_subset() %>%
+      select(datenum, RankOutOfN) %>%
+      filter(!is.na(RankOutOfN)) %>%
+      ggplot(aes(x = datenum, y = RankOutOfN)) +
+      geom_line() +
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
+    
+    p4a <-  cln_artist_subset() %>%
+      select(datenum, ValueOutOf1) %>%
+      filter(!is.na(ValueOutOf1)) %>%
+      ggplot(aes(x = datenum, y = ValueOutOf1)) +
+      geom_line() +
+      labs(x = "Date", y = "Song Value", title = "Overall Value of the Song Over Time")
+    
+    
+    p3a + p4a + p1a + p2a
   })
+  
+  # output$artist_plot <- renderPlot({
+  #   cln_artist_subset() %>%
+  #     select(datenum, TimeInHours) %>%
+  #     group_by(datenum) %>%
+  #     summarize(TotalTime = sum(TimeInHours)) %>%
+  #     ggplot(aes(x = datenum, y = TotalTime)) + 
+  #     geom_line() + 
+  #     labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened by Artist")
+  # })
+  
+
   
   
   ########## ALBUMS #############
