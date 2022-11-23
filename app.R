@@ -16,7 +16,7 @@ library(patchwork)
 cleaned <- readr::read_csv("data/cleaned.csv")
 cleaned_artist <- readr::read_csv("data/cleaned_artist.csv")
 cleaned_album <- readr::read_csv("data/cleaned_album.csv")
-db_misc <-read_csv("data/db_misc.csv", col_types = minittypes, na = c("-", "NA"), guess_max = 1800)
+db_misc <- readr::read_csv("data/db_misc.csv", guess_max = 1800)
 
 
 # Define UI for application
