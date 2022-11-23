@@ -25,54 +25,113 @@ ui <- fluidPage(
     title = "SAAM",
     
     # Sidebar tabs
-    tabPanel("Songs",
-             
-             tabsetPanel(
-               type = "tabs",
-               
-               
-               tabPanel(
-                 "Overall Song Data",
-                 
-                 sidebarPanel(sliderInput(
-                   "topHrs",
-                   "Hours",
-                   min = 0,
-                   max = 200,
-                   value = c(0, 70)
-                 ), 
-                 sliderInput(
-                   "topPlayed",
-                   "Plays",
-                   min = 0,
-                   max = 2500,
-                   value = c(0, 100)
-                 )),
-                 
-                 mainPanel(tableOutput("play_info"))
-               ),
-               
-               tabPanel(
-                 "Individual Song Data",
-                 
-                 sidebarPanel(
-                   selectizeInput(
-                     "song_name",
-                     "Song Name",
-                     choices = sort(unique(cleaned$SongName)),
-                     selected = "Instant Crush (feat. Julian Casablancas)",
-                     options = list(maxOptions = 10)
-                   )
-                 ),
-                 
-                 mainPanel(
-                   tableOutput("song_info"),
-                   tableOutput("song_big4"),
-                   plotOutput("dateTimeListen"),
-                   plotOutput("dateTimeListenNC")
-                 )
-               )
-             )),
+    tabPanel(
+      "Songs",
+      
+      tabsetPanel(
+        type = "tabs",
+        
+        
+        tabPanel(
+          "Overall Song Data",
+          
+          sidebarPanel(
+            sliderInput(
+              "topHrs",
+              "Hours",
+              min = 0,
+              max = 200,
+              value = c(0, 70)
+            ),
+            sliderInput(
+              "topPlayed",
+              "Plays",
+              min = 0,
+              max = 2500,
+              value = c(0, 100)
+            ),
+            dateRangeInput(
+              "song_date_range",
+              "Show Songs Added Between:",
+              start = "2013-08-01",
+              end = "2022-09-01",
+              min = "2013-08-01",
+              max = NULL,
+              format = "yyyy-mm-dd",
+              startview = "month",
+              weekstart = 0,
+              language = "en",
+              separator = " to "
+            ),
+            selectInput(
+              "showNumSongs",
+              "Show Top __",
+              choices = c(10, 20, 30, 50, 100, "All"),
+              selected = "All"
+            )
+            
+          ),
+          
+          mainPanel(tableOutput("play_info"))
+        ),
+        
+        tabPanel(
+          "Individual Song Data",
+          
+          sidebarPanel(
+            selectizeInput(
+              "song_name",
+              "Song Name",
+              choices = sort(unique(cleaned$SongName)),
+              selected = "Instant Crush (feat. Julian Casablancas)",
+              options = list(maxOptions = 10)
+            )
+          ),
+          
+          mainPanel(
+            tableOutput("song_info"),
+            tableOutput("song_big4"),
+            plotOutput("dateTimeListen"),
+            plotOutput("dateTimeListenNC")
+          )
+        ),
+        
+        tabPanel(
+          "By Month",
+          
+          sidebarPanel(
+            selectInput("month_choice_songs",
+                        "Choose Month:",
+                        choices = sort(unique(
+                          as.Date(cleaned$dates, format = "%B %d %Y")
+                        ))),
+            
+            selectInput(
+              "showNumSongsMonth",
+              "Show Top __",
+              choices = c(10, 20, 25, 30, 50, 75, 100, "All"),
+              selected = "All"
+            ),
+            sliderInput(
+              "topHrsMonth",
+              "Hours",
+              min = 0,
+              max = 200,
+              value = c(0, 70)
+            ),
+            sliderInput(
+              "topPlayedMonth",
+              "Plays",
+              min = 0,
+              max = 2500,
+              value = c(0, 100)
+            ),
+            
+          ),
+          mainPanel(tableOutput("monthData"))
+        )
+      )
+    ),
     
     
     # Second big tab
@@ -91,7 +150,8 @@ ui <- fluidPage(
                      min = 0,
                      max = 5000,
                      value = c(0, 100)
-                   ), sliderInput(
+                   ),
+                   sliderInput(
                      "topArtistPlayed",
                      "Plays",
                      min = 0,
@@ -117,57 +177,83 @@ ui <- fluidPage(
                    )
                  ),
                  
-                 mainPanel(tableOutput("overall_artist_info"),
-                          tableOutput("artist_song_info"),
-                           plotOutput("artist_big4"),
-                           plotOutput("dateTimeListenNCA"))
+                 mainPanel(
+                   tableOutput("overall_artist_info"),
+                   tableOutput("artist_song_info"),
+                   plotOutput("artist_big4"),
+                   plotOutput("dateTimeListenNCA")
+                 )
                )
              )),
     
     
     
-    tabPanel( "Albums",
-          tabsetPanel(       
-            type = "tabs",
-                tabPanel(
-                  "Album Info",
-                  sidebarPanel(
-                    selectizeInput(
-                      "album_name",
-                      "Album",
-                      choices = sort(unique(cleaned$Album)),
-                      selected = "21st Century Breakdown",
-                      options = list(maxOptions = 10)
-                    )
-                  ),
-                  
-                  mainPanel(tableOutput("album_info"))
-                ))
-  ),
-  
-  
-  tabPanel("Miscellaneous",
-           
-           tabsetPanel(type = "tabs",
-                       
-                       tabPanel(
-                         "Bourgeoisie by Month"
+    tabPanel("Albums",
+             tabsetPanel(
+               type = "tabs",
+               tabPanel(
+                 "Album Info",
+                 sidebarPanel(
+                   selectizeInput(
+                     "album_name",
+                     "Album",
+                     choices = sort(unique(cleaned$Album)),
+                     selected = "21st Century Breakdown",
+                     options = list(maxOptions = 10)
+                   )
+                 ),
+                 
+                 mainPanel(tableOutput("album_info"))
+               )
+             )),
+    
+    
+    tabPanel("Miscellaneous",
+             
+             tabsetPanel(type = "tabs",
                          
-                       )))
-  
-))
+                         tabPanel(
+                           "Bourgeoisie by Month"
+                           
+                         )))
+    
+  )
+)
+
+
+
 
 server <- function(input, output, session) {
   ###### SONGS ###########
   
+  subset_plays_by_month <- reactive({
+    cleaned %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(
+        !is.na(TimeInHours),
+        TimeInHours >= input$topHrsMonth[1],
+        TimeInHours <= input$topHrsMonth[2],
+        TimeInPlays >= input$topPlayedMonth[1],
+        TimeInPlays <= input$topPlayedMonth[2],
+        datenum == as.Date(input$month_choice_songs)
+      )
+  })
+  
   subset_plays <- reactive({
     cleaned %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      group_by(SongID) %>%
+      filter(!is.na(TimeInHours)) %>%
+      mutate(DateAdded = min(datenum)) %>%
+      ungroup() %>%
       filter(
         !is.na(TimeInHours),
         TimeInHours >= input$topHrs[1],
         TimeInHours <= input$topHrs[2],
         TimeInPlays >= input$topPlayed[1],
-        TimeInPlays <= input$topPlayed[2]
+        TimeInPlays <= input$topPlayed[2],
+        DateAdded >= as.Date(input$song_date_range[1]),
+        DateAdded <= as.Date(input$song_date_range[2])
       )
   })
   
@@ -189,13 +275,28 @@ server <- function(input, output, session) {
     
   })
   
+  
+  
   # overall
   output$play_info <- renderTable({
-    subset_plays() %>%
-      select(SongName, Artist, TimeInHours, TimeInPlays) %>%
-      group_by(SongName) %>%
-      summarise(TotalTime = max(TimeInHours), TotalPlays = max(TimeInPlays)) %>%
-      arrange(desc(TotalTime))
+    if (input$showNumSongs == "All") {
+      subset_plays() %>%
+        select(SongName, Artist, TimeInHours, TimeInPlays) %>%
+        group_by(SongName) %>%
+        summarise(TotalTime = max(TimeInHours),
+                  TotalPlays = max(TimeInPlays)) %>%
+        arrange(desc(TotalTime))
+    }
+    else
+      (
+        subset_plays() %>%
+          select(SongName, Artist, TimeInHours, TimeInPlays) %>%
+          group_by(SongName) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays)) %>%
+          arrange(desc(TotalTime)) %>%
+          slice_head(n = as.integer(input$showNumSongs))
+      )
   })
   
   # individual
@@ -211,10 +312,9 @@ server <- function(input, output, session) {
       select(RankOutOfN, ValueOutOf1, TimeInHours, TimeInPlays)
   })
   
-
+  
   
   output$dateTimeListen <- renderPlot({
-    
     p1 <- cln_subset() %>%
       select(datenum, TimeInHours) %>%
       filter(!is.na(TimeInHours)) %>%
@@ -236,7 +336,7 @@ server <- function(input, output, session) {
       ggplot(aes(x = datenum, y = RankOutOfN)) +
       geom_line() +
       labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
-      
+    
     p4 <-  cln_subset() %>%
       select(datenum, ValueOutOf1) %>%
       filter(!is.na(ValueOutOf1)) %>%
@@ -248,7 +348,7 @@ server <- function(input, output, session) {
     p3 + p4 + p1 + p2
   })
   
-
+  
   
   output$dateTimeListenNC <-
     renderPlot({
@@ -261,13 +361,26 @@ server <- function(input, output, session) {
         labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date Added")
     })
   
-  
+  # by month
+  output$monthData <- renderTable({
+    if (input$showNumSongsMonth == "All") {
+      subset_plays_by_month() %>%
+        select(SongName, Artist, TimeInHours, TimeInPlays) %>%
+        arrange(desc(TimeInHours))
+    }
+    else
+      (
+        subset_plays_by_month() %>%
+          select(SongName, Artist, TimeInHours, TimeInPlays) %>%
+          arrange(desc(TimeInHours)) %>%
+          slice_head(n = as.integer(input$showNumSongsMonth))
+      )
+  }) 
   
   
   ########## ARTISTS #############
   
   subset_artist_plays <- reactive({
-    
     cleaned_artist %>%
       filter(
         !is.na(TimeInHours),
@@ -276,33 +389,29 @@ server <- function(input, output, session) {
         TimeInPlays >= input$topArtistPlayed[1],
         TimeInPlays <= input$topArtistPlayed[2]
       )
-      
+    
   })
   
   cln_artist_by_song_info <- reactive({
     cleaned %>%
-      filter(Artist == input$artist_name,
-             !is.na(TimeInHours)) %>%
+      filter(Artist == input$artist_name,!is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
   })
   
   cln_artist_subset <- reactive({
     cleaned_artist %>%
-      filter(Artist == input$artist_name,
-             !is.na(TimeInHours)) %>%
+      filter(Artist == input$artist_name,!is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
-             MaxRank = as.integer(MaxRank)) 
+             MaxRank = as.integer(MaxRank))
   })
   
   cln_artist_overall_info <- reactive({
     cleaned_artist %>%
       filter(Artist == input$artist_name) %>%
       filter(!is.na(TimeInHours)) %>%
-      summarize(
-        MaximumRank = as.integer(max(MaxRank)),
-        SongCount = as.integer(max(SongCount))
-      )
+      summarize(MaximumRank = as.integer(max(MaxRank)),
+                SongCount = as.integer(max(SongCount)))
   })
   
   
@@ -311,15 +420,16 @@ server <- function(input, output, session) {
     subset_artist_plays() %>%
       select(Artist, TimeInHours, TimeInPlays) %>%
       group_by(Artist) %>%
-      summarise(TotalTime = max(TimeInHours), TotalPlays = max(TimeInPlays)) %>%
+      summarise(TotalTime = max(TimeInHours),
+                TotalPlays = max(TimeInPlays)) %>%
       arrange(desc(TotalTime))
-   
+    
   })
   
   output$artist_song_info <- renderTable({
     cln_artist_by_song_info() %>%
       select(SongName, Album, MaxRank) %>%
-      group_by(SongName,Album, MaxRank) %>%
+      group_by(SongName, Album, MaxRank) %>%
       summarise()
     
   })
@@ -375,7 +485,7 @@ server <- function(input, output, session) {
         geom_line() +
         labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
     })
-
+  
   
   
   ########## ALBUMS #############
@@ -383,7 +493,7 @@ server <- function(input, output, session) {
   
   cln_album_subset <- reactive({
     cleaned %>%
-      filter(Album == input$album_name,!is.na(TimeInHours)) %>%
+      filter(Album == input$album_name, !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
   })
