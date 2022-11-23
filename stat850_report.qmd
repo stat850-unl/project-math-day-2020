@@ -17,9 +17,9 @@ music database, shiny app, R
 
 ## Data Description
 
-The data consists of a collection of multiple Google sheets tracking one person's listening history. There are more than 2100 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though the 
+The data consists of a collection of multiple Google sheets tracking one person's listening history. There are more than 2100 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though there are some missed months and not every observation is made on the last day of the month.
 
-Variables recorded include: 
+Variables recorded in the Songs dataset include: 
 
 - SongID (a unique identifying number), 
 - 24hrMark (the month after the data collection started when the song passed 24 hours of play time), 
@@ -27,7 +27,8 @@ Variables recorded include:
 - dates (the date of the observation), 
 - TimeInHours (total time listened in hours), 
 - TimeInPlays (total time listened in plays), 
-- RankOutOfN (current rank of the song), ValueOutOf1 (scaled rank, with value 1 being best), 
+- RankOutOfN (current rank of the song), 
+- ValueOutOf1 (scaled rank, with value 1 being best)
 - dHours (change in hours listened from the previous observation), 
 - dPlays(change in plays from the previous observations), 
 - dRank, (change in rank from the previous observation), 
@@ -39,6 +40,8 @@ Variables recorded include:
 - SongName (name of the song), 
 - Artist (name of the artist), and 
 - Album (name of the album).
+
+Similar variables and metrics are tracked in the Artist and Album datasets.
 
 ## Methods and Analysis
 
