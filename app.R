@@ -16,6 +16,8 @@ library(patchwork)
 cleaned <- readr::read_csv("data/cleaned.csv")
 cleaned_artist <- readr::read_csv("data/cleaned_artist.csv")
 cleaned_album <- readr::read_csv("data/cleaned_album.csv")
+db_misc <-read_csv("data/db_misc.csv", col_types = minittypes, na = c("-", "NA"), guess_max = 1800)
+
 
 # Define UI for application
 ui <- fluidPage(
@@ -256,10 +258,24 @@ ui <- fluidPage(
              tabsetPanel(type = "tabs",
                          
                          tabPanel(
-                           "Bourgeoisie by Month"
+                           "Bourgeoisie by Month",
+                           sidebarPanel(
+                             selectizeInput(
+                               "month_name_bourgeoisie",
+                               "Month",
+                               choices = unique(colnames(db_misc)[5:ncol(db_misc)]),
+                               selected = "January 2016",
+                               options = list(maxOptions = 10)
+                             )
+                             
+                           ),
+                           mainPanel(
+                             tableOutput("month_stats_bourgeoisie"),
+                             tableOutput("month_songs_bourgeoisie")
+                           )
                            
-                         )))
-    
+                         ))
+    )    
   )
 )
 
@@ -319,7 +335,6 @@ server <- function(input, output, session) {
       )
     
   })
-  
   
   
   # overall
@@ -624,6 +639,28 @@ server <- function(input, output, session) {
   
   
   ########## MISCELLANEOUS #############
+  
+  
+  month_subset <- reactive({
+    db_misc %>%
+      select(input$month_name_bourgeoisie, SongName, Artist, Album) %>%
+      na.omit()
+      
+  })
+  
+  output$month_stats_bourgeoisie <- renderTable({
+    month_subset() %>%
+      mutate(NumberOfSongs = n()) %>%
+      select(NumberOfSongs) %>%
+      slice_head(n=1)
+  })
+  
+  output$month_songs_bourgeoisie <- renderTable({
+    month_subset() %>%
+      mutate(n = row_number()) %>%
+      select(n, SongName, Artist, Album)
+  })
+  
   
 }
 
