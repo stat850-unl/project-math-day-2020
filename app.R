@@ -15,6 +15,7 @@ library(patchwork)
 
 cleaned <- readr::read_csv("data/cleaned.csv")
 cleaned_artist <- readr::read_csv("data/cleaned_artist.csv")
+cleaned_album <- readr::read_csv("data/cleaned_album.csv")
 
 # Define UI for application
 ui <- fluidPage(
@@ -72,7 +73,13 @@ ui <- fluidPage(
             selectInput(
               "secondarySortingFilter",
               "Sort By:",
-              choices = c("-","Most Time Improved", "Most Play Improved", "Most Rank Improved", "Most Value Improved"),
+              choices = c(
+                "-",
+                "Most Time Improved",
+                "Most Play Improved",
+                "Most Rank Improved",
+                "Most Value Improved"
+              ),
               selected = "-"
             )
             ## nothing has been done with the secondary sorting filter yet!
@@ -132,6 +139,19 @@ ui <- fluidPage(
               max = 2500,
               value = c(0, 2500)
             ),
+            selectInput(
+              "secondarySortingFilterMonth",
+              "Sort By:",
+              choices = c(
+                "-",
+                "Most Time Improved",
+                "Most Play Improved",
+                "Most Rank Improved",
+                "Most Value Improved"
+              ),
+              selected = "-"
+            )
+            ## nothing has been done with the secondary sorting filter yet!
             
           ),
           mainPanel(tableOutput("monthData"))
@@ -206,7 +226,7 @@ ui <- fluidPage(
              )),
     
     
-    
+    # third big tab
     tabPanel("Albums",
              tabsetPanel(
                type = "tabs",
@@ -222,9 +242,13 @@ ui <- fluidPage(
                    )
                  ),
                  
-                 mainPanel(tableOutput("album_info"))
+                 mainPanel(
+                   tableOutput("overall_album_info"),
+                   tableOutput("album_info"),
+                 plotOutput("album_big4"),
+                 plotOutput("dateTimeListenNCAl")
                )
-             )),
+             ))),
     
     
     tabPanel("Miscellaneous",
@@ -309,15 +333,13 @@ server <- function(input, output, session) {
         arrange(desc(TotalTime))
     }
     else
-      (
-        subset_plays() %>%
-          select(SongName, Artist, TimeInHours, TimeInPlays) %>%
-          group_by(SongName) %>%
-          summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
-          arrange(desc(TotalTime)) %>%
-          slice_head(n = as.integer(input$showNumSongs))
-      )
+      (subset_plays() %>%
+         select(SongName, Artist, TimeInHours, TimeInPlays) %>%
+         group_by(SongName) %>%
+         summarise(TotalTime = max(TimeInHours),
+                   TotalPlays = max(TimeInPlays)) %>%
+         arrange(desc(TotalTime)) %>%
+         slice_head(n = as.integer(input$showNumSongs)))
   })
   
   # individual
@@ -390,13 +412,11 @@ server <- function(input, output, session) {
         arrange(desc(TimeInHours))
     }
     else
-      (
-        subset_plays_by_month() %>%
-          select(SongName, Artist, TimeInHours, TimeInPlays) %>%
-          arrange(desc(TimeInHours)) %>%
-          slice_head(n = as.integer(input$showNumSongsMonth))
-      )
-  }) 
+      (subset_plays_by_month() %>%
+         select(SongName, Artist, TimeInHours, TimeInPlays) %>%
+         arrange(desc(TimeInHours)) %>%
+         slice_head(n = as.integer(input$showNumSongsMonth)))
+  })
   
   
   ########## ARTISTS #############
@@ -422,14 +442,14 @@ server <- function(input, output, session) {
   
   cln_artist_by_song_info <- reactive({
     cleaned %>%
-      filter(Artist == input$artist_name,!is.na(TimeInHours)) %>%
+      filter(Artist == input$artist_name, !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
   })
   
   cln_artist_subset <- reactive({
     cleaned_artist %>%
-      filter(Artist == input$artist_name,!is.na(TimeInHours)) %>%
+      filter(Artist == input$artist_name, !is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              MaxRank = as.integer(MaxRank))
   })
@@ -518,24 +538,88 @@ server <- function(input, output, session) {
   
   ########## ALBUMS #############
   
-  
   cln_album_subset <- reactive({
-    cleaned %>%
+    cleaned_album %>%
       filter(Album == input$album_name, !is.na(TimeInHours)) %>%
-      mutate(datenum = as.Date(dates, format = "%B %d %Y"),
-             MaxRank = as.integer(MaxRank))
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"))
+  })
+  
+  
+  cln_album_overall_info <- reactive({
+    cleaned_album %>%
+      filter(Album == input$album_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      summarize(SongCount = as.integer(max(SongCount)))
+  })
+  
+  cln_album_by_song_info <- reactive({
+    cleaned %>%
+      filter(Album == input$album_name,!is.na(TimeInHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"))
   })
   
   
   
-  
   output$album_info <- renderTable({
-    cln_album_subset() %>%
+    cln_album_by_song_info() %>%
       select(SongName, Artist, MaxRank) %>%
       group_by(SongName, Artist, MaxRank) %>%
       summarise()
     
   })
+  
+  output$overall_album_info <- renderTable({
+    cln_album_overall_info() %>%
+      select(SongCount)
+  })
+  
+  
+  
+  output$album_big4 <- renderPlot({
+    p1al <- cln_album_subset() %>%
+      select(datenum, TimeInHours) %>%
+      filter(!is.na(TimeInHours)) %>%
+      ggplot(aes(x = datenum, y = TimeInHours)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+    
+    
+    p2al <- cln_album_subset() %>%
+      select(datenum, TimeInPlays) %>%
+      filter(!is.na(TimeInPlays)) %>%
+      ggplot(aes(x = datenum, y = TimeInPlays)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Album's Songs Over Time")
+    
+    p3al <-  cln_album_subset() %>%
+      select(datenum, RankOutOfN) %>%
+      filter(!is.na(RankOutOfN)) %>%
+      ggplot(aes(x = datenum, y = RankOutOfN)) +
+      geom_line() +
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Album Over Time")
+    
+    p4al <-  cln_album_subset() %>%
+      select(datenum, ValueOutOf1) %>%
+      filter(!is.na(ValueOutOf1)) %>%
+      ggplot(aes(x = datenum, y = ValueOutOf1)) +
+      geom_line() +
+      labs(x = "Date", y = "Album Value", title = "Overall Value of the Album Over Time")
+    
+    
+    p3al + p4al + p1al + p2al
+  })
+  
+  
+  output$dateTimeListenNCAl <-
+    renderPlot({
+      #non-cumulative listening hours
+      cln_album_subset() %>%
+        select(datenum, dHours) %>%
+        filter(!is.na(dHours)) %>%
+        ggplot(aes(x = datenum, y = dHours)) +
+        geom_line() +
+        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
+    })
   
   
   
