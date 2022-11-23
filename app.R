@@ -41,14 +41,14 @@ ui <- fluidPage(
               "Hours",
               min = 0,
               max = 200,
-              value = c(0, 70)
+              value = c(0, 200)
             ),
             sliderInput(
               "topPlayed",
               "Plays",
               min = 0,
               max = 2500,
-              value = c(0, 100)
+              value = c(0, 2500)
             ),
             dateRangeInput(
               "song_date_range",
@@ -66,10 +66,16 @@ ui <- fluidPage(
             selectInput(
               "showNumSongs",
               "Show Top __",
-              choices = c(10, 20, 30, 50, 100, "All"),
+              choices = c(10, 25, 50, 100, "All"),
               selected = "All"
+            ),
+            selectInput(
+              "secondarySortingFilter",
+              "Sort By:",
+              choices = c("-","Most Time Improved", "Most Play Improved", "Most Rank Improved", "Most Value Improved"),
+              selected = "-"
             )
-            
+            ## nothing has been done with the secondary sorting filter yet!
           ),
           
           mainPanel(tableOutput("play_info"))
@@ -109,7 +115,7 @@ ui <- fluidPage(
             selectInput(
               "showNumSongsMonth",
               "Show Top __",
-              choices = c(10, 20, 25, 30, 50, 75, 100, "All"),
+              choices = c(10, 25, 50, 75, 100, "All"),
               selected = "All"
             ),
             sliderInput(
@@ -117,14 +123,14 @@ ui <- fluidPage(
               "Hours",
               min = 0,
               max = 200,
-              value = c(0, 70)
+              value = c(0, 200)
             ),
             sliderInput(
               "topPlayedMonth",
               "Plays",
               min = 0,
               max = 2500,
-              value = c(0, 100)
+              value = c(0, 2500)
             ),
             
           ),
@@ -149,14 +155,27 @@ ui <- fluidPage(
                      "Hours",
                      min = 0,
                      max = 5000,
-                     value = c(0, 100)
+                     value = c(0, 500)
                    ),
                    sliderInput(
                      "topArtistPlayed",
                      "Plays",
                      min = 0,
                      max = 30000,
-                     value = c(0, 100)
+                     value = c(0, 500)
+                   ),
+                   dateRangeInput(
+                     "artist_date_range",
+                     "Show Artists Added Between:",
+                     start = "2013-08-01",
+                     end = "2022-09-01",
+                     min = "2013-08-01",
+                     max = NULL,
+                     format = "yyyy-mm-dd",
+                     startview = "month",
+                     weekstart = 0,
+                     language = "en",
+                     separator = " to "
                    )
                    
                  ),
@@ -384,12 +403,19 @@ server <- function(input, output, session) {
   
   subset_artist_plays <- reactive({
     cleaned_artist %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      group_by(ArtistID) %>%
+      filter(!is.na(TimeInHours)) %>%
+      mutate(DateAdded = min(datenum)) %>%
+      ungroup() %>%
       filter(
         !is.na(TimeInHours),
         TimeInHours >= input$topArtistHrs[1],
         TimeInHours <= input$topArtistHrs[2],
         TimeInPlays >= input$topArtistPlayed[1],
-        TimeInPlays <= input$topArtistPlayed[2]
+        TimeInPlays <= input$topArtistPlayed[2],
+        DateAdded >= input$artist_date_range[1],
+        DateAdded <= input$artist_date_range[2]
       )
     
   })

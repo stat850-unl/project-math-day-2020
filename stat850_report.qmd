@@ -136,11 +136,15 @@ The second page would automatically generate if the user clicks on "Instant Crus
 
 Artists and Albums tabs will follow closely to Songs regarding the content.
 
+The tab Bourgeoisie tracks the songs on a playlist named "Bourgeoisie" created by the owner of the listening history data. This playlist is updated each month based on how much the owner is subjectively enjoying songs. So, the amount of time a song stays on the playlist is a metric of how enjoyable the song is to the owner, to some extent.
+
 
 ## Discussion
 
 
 ## Appendix
+
+We would like to acknowledge the Shiny app ``Living in the Lego World''. Significant portions of the user interface were modelled after this app. Full citation: Kaplan, A (2019). _Living in the Lego World_. <https://shiny.rstudio.com/gallery/lego-world.html>
 
 R Packages Used:
 
