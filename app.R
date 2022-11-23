@@ -266,11 +266,13 @@ server <- function(input, output, session) {
   cln_subset_overall_info <- reactive({
     cleaned %>%
       filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
       filter(!is.na(TimeInHours)) %>%
       summarize(
         MaximumRank = as.integer(max(MaxRank)),
         ArtistName = unique(Artist),
-        AlbumName = unique(Album)
+        AlbumName = unique(Album),
+        DateAdded = dplyr::first(dates)
       )
     
   })
@@ -302,7 +304,7 @@ server <- function(input, output, session) {
   # individual
   output$song_info <- renderTable({
     cln_subset_overall_info() %>%
-      select(MaximumRank, ArtistName, AlbumName)
+      select(MaximumRank, ArtistName, AlbumName, DateAdded)
   })
   
   output$song_big4 <- renderTable({
