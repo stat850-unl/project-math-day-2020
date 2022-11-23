@@ -14,6 +14,7 @@ music database, shiny app, R
 
 
 
+
 ## Data Description
 
 The data consists of a collection of multiple Google sheets tracking one person's listening history. There are 1416 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though the 
@@ -41,8 +42,104 @@ Variables recorded include:
 
 ## Methods and Analysis
 
+The main goal of the application is to present the data to a viewer in a clean, easy-to-access manner. The user should ideally be able to think of a song, artist, or album and see firstly if the song is in the data set and secondly see the statistics on that song.
+ 
+For the Songs and artists, there are two sub-tabs that the user can use to investigate the data set. These will be for overall and individual data for song/artist. "Overall" aims to encapsulate data about all songs. The user will be able to sort and filter their data. Each song will be hyperlinked to the individual song data page. "Individual" aims to give a deeper look at any specific song and how it has performed during its time being listened to. The code below gives is everything that will be shown to the user.
+
+```{r,eval=F, messages=F}
+output$song_info <- renderTable({
+    cln_subset_overall_info() %>%
+      select(MaximumRank, ArtistName, AlbumName)
+  })
+  
+  output$song_big4 <- renderTable({
+    cln_subset() %>%
+      filter(!is.na(TimeInHours)) %>%
+      slice_tail(n = 1) %>%
+      select(RankOutOfN, ValueOutOf1, TimeInHours, TimeInPlays)
+  })
+  
+
+  
+  output$dateTimeListen <- renderPlot({
+    
+    p1 <- cln_subset() %>%
+      select(datenum, TimeInHours) %>%
+      filter(!is.na(TimeInHours)) %>%
+      ggplot(aes(x = datenum, y = TimeInHours)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+    
+    
+    p2 <- cln_subset() %>%
+      select(datenum, TimeInPlays) %>%
+      filter(!is.na(TimeInPlays)) %>%
+      ggplot(aes(x = datenum, y = TimeInPlays)) +
+      geom_line() +
+      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Song Over Time")
+    
+    p3 <-  cln_subset() %>%
+      select(datenum, RankOutOfN) %>%
+      filter(!is.na(RankOutOfN)) %>%
+      ggplot(aes(x = datenum, y = RankOutOfN)) +
+      geom_line() +
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
+      
+    p4 <-  cln_subset() %>%
+      select(datenum, ValueOutOf1) %>%
+      filter(!is.na(ValueOutOf1)) %>%
+      ggplot(aes(x = datenum, y = ValueOutOf1)) +
+      geom_line() +
+      labs(x = "Date", y = "Song Value", title = "Overall Value of the Song Over Time")
+    
+    
+    p3 + p4 + p1 + p2
+  })
+  
+
+  
+  output$dateTimeListenNC <-
+    renderPlot({
+      #non-cumulative listening hours
+      cln_subset() %>%
+        select(datenum, dHours) %>%
+        filter(!is.na(dHours)) %>%
+        ggplot(aes(x = datenum, y = dHours)) +
+        geom_line() +
+        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date Added")
+    })
+```
+
+This code will take a song name and return the following:
+
+1. Maximum Rank
+2. Artist Name
+3. Name of the Album
+4. Time in Hours Played
+5. Numer of Plays
+6. 5 different plots, covering:
+  *   Overall rank of the song over time
+  *   Overall value of the song over time
+  *   Cumulative hours listened over time
+  *   Cumulative plats of the song over time
+  *   Hours listened by date added
+
+Examples of the overall and individual are shown below.
+![Overall Example](images/over-song-example.png)
+![Individual Example](images/indiv-song-example.png)
+
+The second page would automatically generate if the user clicks on "Instant Crush (feat. Julian Casablancas)" in the "Overall Song Data" tab.
+
+Artists and Albums tabs will follow closely to Songs regarding the content.
 
 ## Discussion
 
 
 ## Appendix
+
+R Packages Used:
+
+*   shiny
+*   shinythemes
+*   tidyverse 
+*   patchwork
