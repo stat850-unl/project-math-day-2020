@@ -17,7 +17,7 @@ music database, shiny app, R
 
 ## Data Description
 
-The data consists of a collection of multiple Google sheets tracking one person's listening history. There are 1416 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though the 
+The data consists of a collection of multiple Google sheets tracking one person's listening history. There are more than 2100 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though the 
 
 Variables recorded include: 
 
@@ -115,9 +115,10 @@ This code will take a song name and return the following:
 1. Maximum Rank
 2. Artist Name
 3. Name of the Album
-4. Time in Hours Played
-5. Numer of Plays
-6. 5 different plots, covering:
+4. Date Added
+5. Time in Hours Played
+6. Number of Plays
+7. 5 different plots, covering:
   *   Overall rank of the song over time
   *   Overall value of the song over time
   *   Cumulative hours listened over time
@@ -132,6 +133,7 @@ The second page would automatically generate if the user clicks on "Instant Crus
 
 Artists and Albums tabs will follow closely to Songs regarding the content.
 
+
 ## Discussion
 
 
@@ -143,3 +145,5 @@ R Packages Used:
 *   shinythemes
 *   tidyverse 
 *   patchwork
+*   rsconnect
+
