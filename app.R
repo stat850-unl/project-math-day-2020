@@ -34,6 +34,54 @@ ui <- fluidPage(
       tabsetPanel(
         type = "tabs",
         
+      
+        tabPanel(
+          "By Month",
+          
+          sidebarPanel(
+            selectInput("month_choice_songs",
+                        "Choose Month:",
+                        choices = sort(unique(
+                          as.Date(cleaned$dates, format = "%B %d %Y")
+                        ))),
+            
+            selectInput(
+              "showNumSongsMonth",
+              "Show Top __",
+              choices = c(10, 25, 50, 75, 100, "All"),
+              selected = "All"
+            ),
+            sliderInput(
+              "topHrsMonth",
+              "Hours",
+              min = 0,
+              max = 200,
+              value = c(0, 200)
+            ),
+            sliderInput(
+              "topPlayedMonth",
+              "Plays",
+              min = 0,
+              max = 2500,
+              value = c(0, 2500)
+            ),
+            selectInput(
+              "secondarySortingFilterMonth",
+              "Sort By:",
+              choices = c(
+                "-",
+                "Most Time Improved",
+                "Most Play Improved",
+                "Most Rank Improved",
+                "Most Value Improved"
+              ),
+              selected = "-"
+            )
+            ## nothing has been done with the secondary sorting filter yet!
+          ),
+          mainPanel(tableOutput("monthData"))
+      ),
+        
         
         tabPanel(
           "Overall Song Data",
@@ -109,56 +157,10 @@ ui <- fluidPage(
             plotOutput("dateTimeListen"),
             plotOutput("dateTimeListenNC")
           )
-        ),
-        
-        tabPanel(
-          "By Month",
-          
-          sidebarPanel(
-            selectInput("month_choice_songs",
-                        "Choose Month:",
-                        choices = sort(unique(
-                          as.Date(cleaned$dates, format = "%B %d %Y")
-                        ))),
-            
-            selectInput(
-              "showNumSongsMonth",
-              "Show Top __",
-              choices = c(10, 25, 50, 75, 100, "All"),
-              selected = "All"
-            ),
-            sliderInput(
-              "topHrsMonth",
-              "Hours",
-              min = 0,
-              max = 200,
-              value = c(0, 200)
-            ),
-            sliderInput(
-              "topPlayedMonth",
-              "Plays",
-              min = 0,
-              max = 2500,
-              value = c(0, 2500)
-            ),
-            selectInput(
-              "secondarySortingFilterMonth",
-              "Sort By:",
-              choices = c(
-                "-",
-                "Most Time Improved",
-                "Most Play Improved",
-                "Most Rank Improved",
-                "Most Value Improved"
-              ),
-              selected = "-"
-            )
-            ## nothing has been done with the secondary sorting filter yet!
-            
-          ),
-          mainPanel(tableOutput("monthData"))
         )
       )
+        
+        
     ),
     
     
@@ -657,6 +659,7 @@ server <- function(input, output, session) {
   
   output$month_songs_bourgeoisie <- renderTable({
     month_subset() %>%
+      arrange(SongName) %>%
       mutate(n = row_number()) %>%
       select(n, SongName, Artist, Album)
   })
