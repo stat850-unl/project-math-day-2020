@@ -18,9 +18,30 @@ This presentation outlines the data and methods used to create a music database 
 Data:
 
 - consists of a collection of multiple Google sheets tracking one person's listening history
-- more than 2100 songs in the data used, with multiple observations for each song
+- consists of data about songs, artists, albums, and a particular playlist
+
+## Data Description
+
+Songs:
+
+- more than 2100 songs, with multiple observations for each song
 - an observation consists of the previous month's listening statistics for a particular song
--observations are recorded approximately once a month
+- observations are recorded approximately once a month
+
+## Data Description
+
+Artists/Albums:
+
+- more than 580 artists and 1100 albums
+- linked closely to song sheet
+- all artists/albums with songs in the song sheet have similar statistics recorded
+
+## Data Description
+
+Miscellaneous:
+
+- tracks which songs are added to a particular playlist (the playlist "Bourgeoisie")
+- also contains information about number of songs per months and consecutive months for each song on the playlist
 
 
 ## Methods and Analysis
@@ -28,9 +49,13 @@ Data:
 
 ## Discussion
 
+
+
 ## References
 
 We would like to acknowledge the Shiny app ``Living in the Lego World''. Significant portions of the user interface were modelled after this app. Full citation: Kaplan, A (2019). _Living in the Lego World_. <https://shiny.rstudio.com/gallery/lego-world.html>
+
+## References
 
 R Packages Used:
 
