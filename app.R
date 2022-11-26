@@ -294,6 +294,12 @@ ui <- fluidPage(
                                  "Show Top __",
                                  choices = c(10, 25, 50, 100, "All"),
                                  selected = "All"
+                               ),
+                               selectInput(
+                                 "sortByBourg",
+                                 "Sort By:",
+                                 choices = c("Number of Months", "Longest Streak"),
+                                 selected = "Number of Months"
                                )
                                
                              ),
@@ -368,7 +374,8 @@ server <- function(input, output, session) {
         AlbumName = unique(Album),
         DateAdded = dplyr::first(dates)
       ) %>%
-      mutate(MonthsOnBourgeoisie = as.integer(subBour$NumberOfMonths))
+      mutate(MonthsOnBourgeoisie = as.integer(subBour$NumberOfMonths),
+             LongestStreakOnBourgeoisie = as.integer(subBour$LongestStreak))
       
     
   })
@@ -478,7 +485,7 @@ server <- function(input, output, session) {
   
   output$bourgeoisie_song_info <- renderTable({
     cln_subset_overall_info() %>%
-      select(MonthsOnBourgeoisie)
+      select(MonthsOnBourgeoisie, LongestStreakOnBourgeoisie)
   })
   
   output$dateTimeListen <- renderPlot({
@@ -801,7 +808,7 @@ server <- function(input, output, session) {
   
   overall_bour_stats <- reactive({
     db_misc %>%
-      select(SongName, Artist, Album, NumberOfMonths) %>%
+      select(SongName, Artist, Album, NumberOfMonths, LongestStreak) %>%
       na.omit()
     
   })
@@ -822,14 +829,27 @@ server <- function(input, output, session) {
   
   
   output$overall_bourgeoisie_stats <- renderTable({
-    if(input$showNumBourg == "All"){
-      overall_bour_stats() %>%
-        arrange(desc(as.integer(NumberOfMonths)))
+    if(input$sortByBourg == "Number of Months"){
+      if(input$showNumBourg == "All"){
+        overall_bour_stats() %>%
+          arrange(desc(as.integer(NumberOfMonths)))
+      }
+      else{
+        overall_bour_stats() %>%
+          arrange(desc(as.integer(NumberOfMonths))) %>%
+          slice_head(n = as.integer(input$showNumBourg))
+      }
     }
-    else{
-      overall_bour_stats() %>%
-        arrange(desc(as.integer(NumberOfMonths))) %>%
-        slice_head(n = as.integer(input$showNumBourg))
+    else if(input$sortByBourg == "Longest Streak"){
+      if(input$showNumBourg == "All"){
+        overall_bour_stats() %>%
+          arrange(desc(as.integer(LongestStreak)))
+      }
+      else{
+        overall_bour_stats() %>%
+          arrange(desc(as.integer(LongestStreak))) %>%
+          slice_head(n = as.integer(input$showNumBourg))
+      }
     }
   })
   
