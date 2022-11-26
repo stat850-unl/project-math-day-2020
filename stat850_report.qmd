@@ -6,6 +6,8 @@ format: html
 
 ## Abstract:
 
+This report outlines the data and methods used to create a music database based on one person's listening history. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The database is housed at <https://mollyc.shinyapps.io/project-math-day-2020/>.
+
 ### Keywords:
 
 music database, shiny app, R
