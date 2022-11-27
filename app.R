@@ -277,7 +277,7 @@ ui <- fluidPage(
                              selectizeInput(
                                "month_name_bourgeoisie",
                                "Month",
-                               choices = unique(colnames(db_misc)[5:ncol(db_misc)]),
+                               choices = unique(colnames(db_misc)[5:ncol(db_misc)-1]),
                                selected = "January 2016"
                              ),
                            ),
@@ -366,13 +366,16 @@ server <- function(input, output, session) {
     
     cleaned %>%
       filter(SongName == input$song_name) %>%
-      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"),
+             rowN = first(which(RankOutOfN == MaxRank)),
+             DateOfMaxRank = dates[rowN]) %>%
       filter(!is.na(TimeInHours)) %>%
       summarize(
         MaximumRank = as.integer(max(MaxRank)),
         ArtistName = unique(Artist),
         AlbumName = unique(Album),
-        DateAdded = dplyr::first(dates)
+        DateAdded = dplyr::first(dates),
+        DateOfMaxRank = first(DateOfMaxRank)
       ) %>%
       mutate(MonthsOnBourgeoisie = as.integer(subBour$NumberOfMonths),
              LongestStreakOnBourgeoisie = as.integer(subBour$LongestStreak))
@@ -473,7 +476,7 @@ server <- function(input, output, session) {
   # individual
   output$song_info <- renderTable({
     cln_subset_overall_info() %>%
-      select(MaximumRank, ArtistName, AlbumName, DateAdded) #need to add date of max rank
+      select(MaximumRank, DateOfMaxRank, ArtistName, AlbumName, DateAdded) #need to add date of max rank
   })
   
   output$song_big4 <- renderTable({
@@ -509,7 +512,8 @@ server <- function(input, output, session) {
       filter(!is.na(RankOutOfN)) %>%
       ggplot(aes(x = datenum, y = RankOutOfN)) +
       geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time") +
+      scale_y_reverse()
     
     p4 <-  cln_subset() %>%
       select(datenum, ValueOutOf1) %>%
@@ -521,7 +525,6 @@ server <- function(input, output, session) {
     
     p3 + p4 + p1 + p2
   })
-  
   
   
   output$dateTimeListenNC <-
@@ -682,7 +685,8 @@ server <- function(input, output, session) {
       filter(!is.na(RankOutOfN)) %>%
       ggplot(aes(x = datenum, y = RankOutOfN)) +
       geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Artist Over Time")
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Artist Over Time") +
+      scale_y_reverse()
     
     p4a <-  cln_artist_subset() %>%
       select(datenum, ValueOutOf1) %>%
@@ -693,6 +697,8 @@ server <- function(input, output, session) {
     
     
     p3a + p4a + p1a + p2a
+    
+    
   })
   
   
@@ -769,7 +775,8 @@ server <- function(input, output, session) {
       filter(!is.na(RankOutOfN)) %>%
       ggplot(aes(x = datenum, y = RankOutOfN)) +
       geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Album Over Time")
+      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Album Over Time") +
+      scale_y_reverse()
     
     p4al <-  cln_album_subset() %>%
       select(datenum, ValueOutOf1) %>%
