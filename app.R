@@ -32,6 +32,7 @@ ui <- fluidPage(
       "Songs",
       
       tabsetPanel(
+        id = 'songs',
         type = "tabs",
         
       
@@ -167,7 +168,8 @@ ui <- fluidPage(
                 "Artist",
                 "Album"
               )
-            )
+            ),
+            actionButton('jumpToIndivSong', "Song Information")
           ),
           
           mainPanel(tableOutput("play_info"))
@@ -473,6 +475,9 @@ server <- function(input, output, session) {
       }
     }
   })
+  observeEvent(input$jumpToIndivSong, {updateTabsetPanel(session=getDefaultReactiveDomain(),
+                                                         'songs',
+                                                         selected = "Individual Song Data")})
   
   # individual
   output$song_info <- renderTable({
@@ -526,6 +531,7 @@ server <- function(input, output, session) {
     
     p3 + p4 + p1 + p2
   })
+  
   
   
   output$dateTimeListenNC <-
