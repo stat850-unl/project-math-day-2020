@@ -85,9 +85,10 @@ ui <- fluidPage(
                 "Artist",
                 "Album"
               )
-            )
+            ),
+            actionButton('jumpToIndivSong', "Song Information")
           ),
-          mainPanel(tableOutput("monthData"))
+          mainPanel(DT::dataTableOutput("monthSong"))
       ),
         
       tabPanel(
@@ -172,7 +173,7 @@ ui <- fluidPage(
             actionButton('jumpToIndivSong', "Song Information")
           ),
           
-          mainPanel(tableOutput("play_info"))
+          mainPanel(DT::dataTableOutput("overallSong"))
         )
       )
         
@@ -388,7 +389,7 @@ server <- function(input, output, session) {
   
   
   # overall
-  output$play_info <- renderTable({
+  output$overallSong <- DT::renderDataTable({
    if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
      if(input$showNumSongs == "All"){
        subset_plays() %>%
@@ -474,7 +475,7 @@ server <- function(input, output, session) {
          slice_head(n = as.integer(input$showNumSongs))
       }
     }
-  })
+  },server=F, selection='single')
   observeEvent(input$jumpToIndivSong, {updateTabsetPanel(session=getDefaultReactiveDomain(),
                                                          'songs',
                                                          selected = "Individual Song Data")})
@@ -546,7 +547,7 @@ server <- function(input, output, session) {
     })
   
   # by month
-  output$monthData <- renderTable({
+  output$monthSong <- DT::renderDataTable({
     if(("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
       if (input$showNumSongsMonth == "All") {
         subset_plays_by_month() %>%
@@ -599,7 +600,7 @@ server <- function(input, output, session) {
          slice_head(n = as.integer(input$showNumSongsMonth))
     }
     }
-  })
+  },server=F,selection='single')
   
   
   ########## ARTISTS #############
