@@ -52,12 +52,6 @@ ui <- fluidPage(
                           as.Date(cleaned$dates, format = "%B %d %Y")
                         ))),
             
-            selectInput(
-              "showNumSongsMonth",
-              "Show Top __",
-              choices = c(10, 25, 50, 75, 100, "All"),
-              selected = "All"
-            ),
             sliderInput(
               "topHrsMonth",
               "Hours",
@@ -149,12 +143,6 @@ ui <- fluidPage(
               weekstart = 0,
               language = "en",
               separator = " to "
-            ),
-            selectInput(
-              "showNumSongs",
-              "Show Top __",
-              choices = c(10, 25, 50, 100, "All"),
-              selected = "All"
             ),
             selectInput(
               "secondarySortingFilter",
@@ -402,7 +390,6 @@ server <- function(input, output, session) {
   # overall
   output$overallSong <- renderDataTable({
    if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
-     if(input$showNumSongs == "All"){
        subset_plays() %>%
          group_by(SongName,Artist,Album, DateOfOccurrence) %>%
          summarise(TotalTime = max(TimeInHours),
@@ -410,20 +397,10 @@ server <- function(input, output, session) {
          ungroup() %>%
          select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence) %>%
          arrange(desc(TotalTime))
-     }
-     else{
-       subset_plays() %>%
-         group_by(SongName, Artist,Album, DateOfOccurrence) %>%
-         summarise(TotalTime = max(TimeInHours),
-                   TotalPlays = max(TimeInPlays)) %>%
-         ungroup() %>%
-         select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence) %>%
-         arrange(desc(TotalTime)) %>%
-         slice_head(n = as.integer(input$showNumSongs))
-     }
+     
    }
     else if(!("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
-      if(input$showNumSongs == "All"){
+
         subset_plays() %>%
           group_by(SongName, Artist, DateOfOccurrence) %>%
           summarise(TotalTime = max(TimeInHours),
@@ -431,21 +408,11 @@ server <- function(input, output, session) {
           ungroup() %>%
           select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence) %>%
           arrange(desc(TotalTime))
-      }
-      else{
-        subset_plays() %>%
-          group_by(SongName, Artist, DateOfOccurrence) %>%
-          summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
-          ungroup() %>%
-          select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence) %>%
-          arrange(desc(TotalTime)) %>%
-          slice_head(n = as.integer(input$showNumSongs))
-      }
+
     }
     else if(("Album" %in% input$tertiarySortingFilter) & !("Artist" %in% input$tertiarySortingFilter)){
 
-    if(input$showNumSongs == "All"){
+
       subset_plays() %>%
         group_by(SongName, Album, DateOfOccurrence) %>%
         summarise(TotalTime = max(TimeInHours),
@@ -453,20 +420,10 @@ server <- function(input, output, session) {
         ungroup() %>%
         select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence) %>%
         arrange(desc(TotalTime))
-    }
-      else{
-        subset_plays() %>%
-          group_by(SongName, Album, DateOfOccurrence) %>%
-          summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
-          ungroup() %>%
-          select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence) %>%
-          arrange(desc(TotalTime)) %>%
-          slice_head(n = as.integer(input$showNumSongs))
-      }
+
     }
     else{
-      if(input$showNumSongs == "All"){
+
         subset_plays() %>%
           group_by(SongName, DateOfOccurrence) %>%
           summarise(TotalTime = max(TimeInHours),
@@ -474,17 +431,7 @@ server <- function(input, output, session) {
           ungroup() %>%
           select(SongName, TotalTime, TotalPlays,DateOfOccurrence) %>%
           arrange(desc(TotalTime))
-      }
-      else{
-      subset_plays() %>%
-         group_by(SongName, DateOfOccurrence) %>%
-         summarise(TotalTime = max(TimeInHours),
-                   TotalPlays = max(TimeInPlays)) %>%
-          ungroup() %>%
-          select(SongName, TotalTime, TotalPlays, DateOfOccurrence) %>%
-         arrange(desc(TotalTime)) %>%
-         slice_head(n = as.integer(input$showNumSongs))
-      }
+
     }
   },server=F, selection='single')
   
@@ -574,56 +521,30 @@ server <- function(input, output, session) {
   # by month
   output$monthSong <- renderDataTable({
     if(("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
-      if (input$showNumSongsMonth == "All") {
+      
         subset_plays_by_month() %>%
           select(SongName, Artist, Album, TimeInHours, TimeInPlays) %>%
           arrange(desc(TimeInHours))
-      }
-      else{
-        subset_plays_by_month() %>%
-          select(SongName, Artist, Album, TimeInHours, TimeInPlays) %>%
-          arrange(desc(TimeInHours)) %>%
-          slice_head(n = as.integer(input$showNumSongsMonth))
-      }
+
     }
     else if(("Album" %in% input$tertiarySortingFilterMonth) & !("Artist" %in% input$tertiarySortingFilterMonth)){
-      if (input$showNumSongsMonth == "All") {
+      
         subset_plays_by_month() %>%
           select(SongName, Album, TimeInHours, TimeInPlays) %>%
           arrange(desc(TimeInHours))
-      }
-      else{
-        subset_plays_by_month() %>%
-          select(SongName, Album,TimeInHours, TimeInPlays) %>%
-          arrange(desc(TimeInHours)) %>%
-          slice_head(n = as.integer(input$showNumSongsMonth))
-      }
+
     }
       else if(!("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
-        if (input$showNumSongsMonth == "All") {
           subset_plays_by_month() %>%
             select(SongName, Artist, TimeInHours, TimeInPlays) %>%
             arrange(desc(TimeInHours))
-        }
-        else{
-          subset_plays_by_month() %>%
-            select(SongName, Artist, TimeInHours, TimeInPlays) %>%
-            arrange(desc(TimeInHours)) %>%
-            slice_head(n = as.integer(input$showNumSongsMonth))
-        }
+
       }
     else{
-    if (input$showNumSongsMonth == "All") {
       subset_plays_by_month() %>%
         select(SongName, TimeInHours, TimeInPlays) %>%
         arrange(desc(TimeInHours))
-    }
-    else{
-      subset_plays_by_month() %>%
-         select(SongName, TimeInHours, TimeInPlays) %>%
-         arrange(desc(TimeInHours)) %>%
-         slice_head(n = as.integer(input$showNumSongsMonth))
-    }
+
     }
   },server=F,selection='single')
   
