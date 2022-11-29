@@ -11,6 +11,7 @@ library(shiny)
 library(shinythemes)
 library(tidyverse)
 library(patchwork)
+library(DT)
 
 
 cleaned <- readr::read_csv("data/cleaned.csv")
