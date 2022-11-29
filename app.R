@@ -381,10 +381,11 @@ server <- function(input, output, session) {
         subset_plays() %>%
           group_by(SongName,Artist,Album, DateOfOccurrence) %>%
           summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
+                    TotalPlays = max(TimeInPlays),
+                    TotalTimeImprovement = max(TotaldTime)) %>%
           ungroup() %>%
-          select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence) %>%
-          arrange(desc(TotalTime))
+          select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence, TotalTimeImprovement) %>%
+          arrange(desc(TotalTimeImprovement))
         
       }
       else if(!("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
@@ -392,10 +393,11 @@ server <- function(input, output, session) {
         subset_plays() %>%
           group_by(SongName, Artist, DateOfOccurrence) %>%
           summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
+                    TotalPlays = max(TimeInPlays),
+                    TotalTimeImprovement = max(TotaldTime)) %>%
           ungroup() %>%
-          select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence) %>%
-          arrange(desc(TotalTime))
+          select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence, TotalTimeImprovement) %>%
+          arrange(desc(TotalTimeImprovement))
         
       }
       else if(("Album" %in% input$tertiarySortingFilter) & !("Artist" %in% input$tertiarySortingFilter)){
@@ -404,10 +406,11 @@ server <- function(input, output, session) {
         subset_plays() %>%
           group_by(SongName, Album, DateOfOccurrence) %>%
           summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
+                    TotalPlays = max(TimeInPlays),
+                    TotalTimeImprovement = max(TotaldTime)) %>%
           ungroup() %>%
-          select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence) %>%
-          arrange(desc(TotalTime))
+          select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence,TotalTimeImprovement) %>%
+          arrange(desc(TotalTimeImprovement))
         
       }
       else{
@@ -415,10 +418,164 @@ server <- function(input, output, session) {
         subset_plays() %>%
           group_by(SongName, DateOfOccurrence) %>%
           summarise(TotalTime = max(TimeInHours),
-                    TotalPlays = max(TimeInPlays)) %>%
+                    TotalPlays = max(TimeInPlays),
+                    TotalTimeImprovement = max(TotaldTime)) %>%
           ungroup() %>%
-          select(SongName, TotalTime, TotalPlays,DateOfOccurrence) %>%
-          arrange(desc(TotalTime))
+          select(SongName, TotalTime, TotalPlays,DateOfOccurrence,TotalTimeImprovement) %>%
+          arrange(desc(TotalTimeImprovement))
+        
+      }
+    }
+    else if("Most Play Improved" == input$secondarySortingFilter){
+      
+      if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
+        subset_plays() %>%
+          group_by(SongName,Artist,Album, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalPlayImprovement = max(TotaldPlays)) %>%
+          ungroup() %>%
+          select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence, TotalPlayImprovement) %>%
+          arrange(desc(TotalPlayImprovement))
+        
+      }
+      else if(!("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
+        
+        subset_plays() %>%
+          group_by(SongName, Artist, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalPlayImprovement = max(TotaldPlays)) %>%
+          ungroup() %>%
+          select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence, TotalPlayImprovement) %>%
+          arrange(desc(TotalPlayImprovement))
+        
+      }
+      else if(("Album" %in% input$tertiarySortingFilter) & !("Artist" %in% input$tertiarySortingFilter)){
+        
+        
+        subset_plays() %>%
+          group_by(SongName, Album, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalPlayImprovement = max(TotaldPlays)) %>%
+          ungroup() %>%
+          select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence,TotalPlayImprovement) %>%
+          arrange(desc(TotalPlayImprovement))
+        
+      }
+      else{
+        
+        subset_plays() %>%
+          group_by(SongName, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalPlayImprovement = max(TotaldPlays)) %>%
+          ungroup() %>%
+          select(SongName, TotalTime, TotalPlays,DateOfOccurrence,TotalPlayImprovement) %>%
+          arrange(desc(TotalPlayImprovement))
+        
+      }
+    }
+    else if("Most Rank Improved" == input$secondarySortingFilter){
+      
+      if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
+        subset_plays() %>%
+          group_by(SongName,Artist,Album, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalRankImprovement = max(TotaldRank)) %>%
+          ungroup() %>%
+          select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence, TotalRankImprovement) %>%
+          arrange(desc(TotalRankImprovement))
+        
+      }
+      else if(!("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
+        
+        subset_plays() %>%
+          group_by(SongName, Artist, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalRankImprovement = max(TotaldRank)) %>%
+          ungroup() %>%
+          select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence, TotalRankImprovement) %>%
+          arrange(desc(TotalRankImprovement))
+        
+      }
+      else if(("Album" %in% input$tertiarySortingFilter) & !("Artist" %in% input$tertiarySortingFilter)){
+        
+        
+        subset_plays() %>%
+          group_by(SongName, Album, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalRankImprovement = max(TotaldRank)) %>%
+          ungroup() %>%
+          select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence,TotalRankImprovement) %>%
+          arrange(desc(TotalRankImprovement))
+        
+      }
+      else{
+        
+        subset_plays() %>%
+          group_by(SongName, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalRankImprovement = max(TotaldRank)) %>%
+          ungroup() %>%
+          select(SongName, TotalTime, TotalPlays,DateOfOccurrence,TotalRankImprovement) %>%
+          arrange(desc(TotalRankImprovement))
+        
+      }
+    }
+    else if("Most Value Improved" == input$secondarySortingFilter){
+      
+      if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
+        subset_plays() %>%
+          group_by(SongName,Artist,Album, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalValueImprovement = max(TotaldValue)) %>%
+          ungroup() %>%
+          select(SongName, Artist, Album, TotalTime, TotalPlays, DateOfOccurrence, TotalValueImprovement) %>%
+          arrange(desc(TotalValueImprovement))
+        
+      }
+      else if(!("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
+        
+        subset_plays() %>%
+          group_by(SongName, Artist, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalValueImprovement = max(TotaldValue)) %>%
+          ungroup() %>%
+          select(SongName, Artist, TotalTime, TotalPlays, DateOfOccurrence, TotalValueImprovement) %>%
+          arrange(desc(TotalValueImprovement))
+        
+      }
+      else if(("Album" %in% input$tertiarySortingFilter) & !("Artist" %in% input$tertiarySortingFilter)){
+        
+        
+        subset_plays() %>%
+          group_by(SongName, Album, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalValueImprovement = max(TotaldValue)) %>%
+          ungroup() %>%
+          select(SongName, Album, TotalTime, TotalPlays, DateOfOccurrence,TotalValueImprovement) %>%
+          arrange(desc(TotalValueImprovement))
+        
+      }
+      else{
+        
+        subset_plays() %>%
+          group_by(SongName, DateOfOccurrence) %>%
+          summarise(TotalTime = max(TimeInHours),
+                    TotalPlays = max(TimeInPlays),
+                    TotalValueImprovement = max(TotaldValue)) %>%
+          ungroup() %>%
+          select(SongName, TotalTime, TotalPlays,DateOfOccurrence,TotalValueImprovement) %>%
+          arrange(desc(TotalValueImprovement))
         
       }
     }
