@@ -7,7 +7,14 @@
 #    http://shiny.rstudio.com/
 #
 
+## WARNING: This will check for installed packages and install if they are not.
+## If you want to read over the documentation on each package before installation,
+## see "stat850-report.qmd".
 
+requiredPackages <- c('shiny','shinythemes','tidyverse','patchwork','DT')
+for(package in requiredPackages){
+  if(package %in% rownames(installed.packages()) == FALSE) {install.packages(package)}
+}
 
 
 
