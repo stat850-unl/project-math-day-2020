@@ -173,7 +173,8 @@ ui <- fluidPage(
             actionButton('jumpToIndivSong', "Song Information")
           ),
           
-          mainPanel(DT::dataTableOutput("overallSong"))
+          mainPanel(DT::dataTableOutput("overallSong"),
+                    verbatimTextOutput('selectedSong'))
         )
       )
         
@@ -476,6 +477,9 @@ server <- function(input, output, session) {
       }
     }
   },server=F, selection='single')
+  
+  output$selectedSong <- renderPrint(input$overallSong_cell_clicked$value)
+  
   observeEvent(input$jumpToIndivSong, {updateTabsetPanel(session=getDefaultReactiveDomain(),
                                                          'songs',
                                                          selected = "Individual Song Data")})
