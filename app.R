@@ -86,10 +86,11 @@ ui <- fluidPage(
                 "Artist",
                 "Album"
               )
-            ),
-            actionButton('jumpToIndivSong', "Song Information")
+            )
+            ,actionButton('jumpToIndivSongM', "Song Information")
           ),
-          mainPanel(DT::dataTableOutput("monthSong"))
+          mainPanel(DT::dataTableOutput("monthSong"),
+                    verbatimTextOutput('selectedSongM'))
       ),
         
       tabPanel(
@@ -171,11 +172,11 @@ ui <- fluidPage(
                 "Album"
               )
             ),
-            actionButton('jumpToIndivSong', "Song Information")
+            actionButton('jumpToIndivSongO', "Song Information")
           ),
           
           mainPanel(DT::dataTableOutput("overallSong"),
-                    verbatimTextOutput('selectedSong'))
+                    verbatimTextOutput('selectedSongO'))
         )
       )
         
@@ -187,6 +188,7 @@ ui <- fluidPage(
     tabPanel("Artists",
              
              tabsetPanel(
+               id= 'artists',
                type = "tabs",
                
                tabPanel(
@@ -219,10 +221,12 @@ ui <- fluidPage(
                      weekstart = 0,
                      language = "en",
                      separator = " to "
-                   )
+                   ),
+                   actionButton('jumpToIndivArtist', "Artist Information")
                    
                  ),
-                 mainPanel(tableOutput("artist_play_info"))
+                 mainPanel(DT::dataTableOutput("overallArtist"),
+                           verbatimTextOutput('selectedArtist'))
                  
                ),
                
@@ -479,11 +483,17 @@ server <- function(input, output, session) {
     }
   },server=F, selection='single')
   
-  output$selectedSong <- renderPrint(input$overallSong_cell_clicked$value)
+  output$selectedSongO <- reactive(input$overallSong_cell_clicked$value)
   
-  observeEvent(input$jumpToIndivSong, {updateTabsetPanel(session=getDefaultReactiveDomain(),
+  # Below lines of code is not working and crashes the app -C
+  # updateSelectInput(session=getDefaultReactiveDomain(),'song_name','Song Name', choices =  sort(unique(cleaned$SongName)), selected = output$selectedSongO)
+  # observeEvent(input$overallSong_cell_clicked$value, {updateSelectInput(session=getDefaultReactiveDomain(),
+  # 'song_name', selected = overallSong_cell_clicked$value)})
+  
+  observeEvent(input$jumpToIndivSongO,{updateTabsetPanel(session=getDefaultReactiveDomain(),
                                                          'songs',
                                                          selected = "Individual Song Data")})
+  # I need to somehow smash the two above lines (updateSelectInput and updateTabsetPanel) together. Can I do it in the same observeEvent code?
   
   # individual
   output$song_info <- renderTable({
@@ -551,6 +561,11 @@ server <- function(input, output, session) {
         labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date Added")
     })
   
+  output$selectedArtist <- reactive(input$overallArtist_cell_clicked$value)
+  observeEvent(input$jumpToIndivArtist,{updateTabsetPanel(session=getDefaultReactiveDomain(),
+                                                         'artists',
+                                                         selected = "Individual Artist Data")})
+  
   # by month
   output$monthSong <- DT::renderDataTable({
     if(("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
@@ -607,6 +622,10 @@ server <- function(input, output, session) {
     }
   },server=F,selection='single')
   
+  output$selectedSongM <- reactive(input$monthSong_cell_clicked$value)
+  observeEvent(input$jumpToIndivSongM,{updateTabsetPanel(session=getDefaultReactiveDomain(),
+                                                        'songs',
+                                                        selected = "Individual Song Data")})
   
   ########## ARTISTS #############
   
@@ -653,7 +672,7 @@ server <- function(input, output, session) {
   
   
   
-  output$artist_play_info <- renderTable({
+  output$overallArtist <- DT::renderDataTable({
     subset_artist_plays() %>%
       select(Artist, TimeInHours, TimeInPlays) %>%
       group_by(Artist) %>%
@@ -661,7 +680,7 @@ server <- function(input, output, session) {
                 TotalPlays = max(TimeInPlays)) %>%
       arrange(desc(TotalTime))
     
-  })
+  },server=F,selection='single')
   
   output$artist_song_info <- renderTable({
     cln_artist_by_song_info() %>%
