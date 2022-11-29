@@ -290,21 +290,7 @@ ui <- fluidPage(
                          ),
                            tabPanel(
                              "Overall Bourgeoisie Info",
-                             sidebarPanel(
-                               selectInput(
-                                 "showNumBourg",
-                                 "Show Top __",
-                                 choices = c(10, 25, 50, 100, "All"),
-                                 selected = "All"
-                               ),
-                               selectInput(
-                                 "sortByBourg",
-                                 "Sort By:",
-                                 choices = c("Number of Months", "Longest Streak", "Current Streak"),
-                                 selected = "Number of Months"
-                               )
-                               
-                             ),
+                             
                              mainPanel(
                                dataTableOutput("overallBourgeoisie")
                              )
@@ -794,39 +780,7 @@ server <- function(input, output, session) {
   
   
   output$overallBourgeoisie <- renderDataTable({
-    if(input$sortByBourg == "Number of Months"){
-      if(input$showNumBourg == "All"){
-        overall_bour_stats() %>%
-          arrange(desc(as.integer(NumberOfMonths)))
-      }
-      else{
-        overall_bour_stats() %>%
-          arrange(desc(as.integer(NumberOfMonths))) %>%
-          slice_head(n = as.integer(input$showNumBourg))
-      }
-    }
-    else if(input$sortByBourg == "Longest Streak"){
-      if(input$showNumBourg == "All"){
-        overall_bour_stats() %>%
-          arrange(desc(as.integer(LongestStreak)))
-      }
-      else{
-        overall_bour_stats() %>%
-          arrange(desc(as.integer(LongestStreak))) %>%
-          slice_head(n = as.integer(input$showNumBourg))
-      }
-    }
-    else if(input$sortByBourg == "Current Streak"){
-      if(input$showNumBourg == "All"){
-        overall_bour_stats() %>%
-          arrange(desc(as.integer(CurrentStreak)))
-      }
-      else{
-        overall_bour_stats() %>%
-          arrange(desc(as.integer(CurrentStreak))) %>%
-          slice_head(n = as.integer(input$showNumBourg))
-      }
-    }
+    overall_bour_stats()
   })
   
 }
