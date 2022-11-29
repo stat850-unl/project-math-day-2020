@@ -11,7 +11,7 @@
 ## If you want to read over the documentation on each package before installation,
 ## see "stat850-report.qmd".
 
-requiredPackages <- c('shiny','shinythemes','tidyverse','patchwork','DT')
+requiredPackages <- c('shiny','shinythemes','tidyverse','patchwork','DT', 'highcharter')
 for(package in requiredPackages){
   if(package %in% rownames(installed.packages()) == FALSE) {install.packages(package)}
 }
@@ -24,6 +24,7 @@ library(shinythemes)
 library(tidyverse)
 library(patchwork)
 library(DT)
+library(highcharter)
 
 
 cleaned <- readr::read_csv("data/cleaned.csv")
@@ -983,6 +984,10 @@ server <- function(input, output, session) {
         ggplot(aes(x = datenum, y = dHours)) +
         geom_line() +
         labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
+
+      
+      
+      
     })
   
   
