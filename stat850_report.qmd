@@ -150,10 +150,10 @@ We would like to acknowledge the Shiny app "Living in the Lego World''. Signific
 
 ### R Packages Used:
 
-*   shiny
-*   shinythemes
-*   tidyverse 
-*   patchwork
-*   rsconnect
-*   DT
+*   [shiny](https://cran.r-project.org/web/packages/shiny/shiny.pdf)
+*   [shinythemes](https://cran.r-project.org/web/packages/shinythemes/shinythemes.pdf)
+*   [tidyverse](https://cran.r-project.org/web/packages/tidyverse/tidyverse.pdf)
+*   [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf)
+*   [rsconnect](https://cran.r-project.org/web/packages/rsconnect/rsconnect.pdf)
+*   [DT](https://cran.r-project.org/web/packages/DT/DT.pdf)
 
