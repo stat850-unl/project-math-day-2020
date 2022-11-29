@@ -7,10 +7,16 @@
 #    http://shiny.rstudio.com/
 #
 
+
+
+
+
+
 library(shiny)
 library(shinythemes)
 library(tidyverse)
 library(patchwork)
+library(DT)
 
 
 cleaned <- readr::read_csv("data/cleaned.csv")
@@ -88,7 +94,7 @@ ui <- fluidPage(
             )
             ,actionButton('jumpToIndivSongM', "Song Information")
           ),
-          mainPanel(DT::dataTableOutput("monthSong"),
+          mainPanel(dataTableOutput("monthSong"),
                     verbatimTextOutput('selectedSongM'))
       ),
         
@@ -174,7 +180,7 @@ ui <- fluidPage(
             actionButton('jumpToIndivSongO', "Song Information")
           ),
           
-          mainPanel(DT::dataTableOutput("overallSong"),
+          mainPanel(dataTableOutput("overallSong"),
                     verbatimTextOutput('selectedSongO'))
         )
       )
@@ -224,7 +230,7 @@ ui <- fluidPage(
                    actionButton('jumpToIndivArtist', "Artist Information")
                    
                  ),
-                 mainPanel(DT::dataTableOutput("overallArtist"),
+                 mainPanel(dataTableOutput("overallArtist"),
                            verbatimTextOutput('selectedArtist'))
                  
                ),
@@ -312,7 +318,7 @@ ui <- fluidPage(
                                
                              ),
                              mainPanel(
-                               tableOutput("overall_bourgeoisie_stats")
+                               dataTableOutput("overallBourgeoisie")
                              )
                              
                          ))
@@ -394,7 +400,7 @@ server <- function(input, output, session) {
   
   
   # overall
-  output$overallSong <- DT::renderDataTable({
+  output$overallSong <- renderDataTable({
    if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
      if(input$showNumSongs == "All"){
        subset_plays() %>%
@@ -566,7 +572,7 @@ server <- function(input, output, session) {
                                                          selected = "Individual Artist Data")})
   
   # by month
-  output$monthSong <- DT::renderDataTable({
+  output$monthSong <- renderDataTable({
     if(("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
       if (input$showNumSongsMonth == "All") {
         subset_plays_by_month() %>%
@@ -671,7 +677,7 @@ server <- function(input, output, session) {
   
   
   
-  output$overallArtist <- DT::renderDataTable({
+  output$overallArtist <- renderDataTable({
     subset_artist_plays() %>%
       select(Artist, TimeInHours, TimeInPlays) %>%
       group_by(Artist) %>%
@@ -866,7 +872,7 @@ server <- function(input, output, session) {
   })
   
   
-  output$overall_bourgeoisie_stats <- renderTable({
+  output$overallBourgeoisie <- renderDataTable({
     if(input$sortByBourg == "Number of Months"){
       if(input$showNumBourg == "All"){
         overall_bour_stats() %>%
