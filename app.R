@@ -116,7 +116,8 @@ ui <- fluidPage(
           tableOutput("song_info"),
           tableOutput("song_big4"),
           tableOutput("bourgeoisie_song_info"),
-          plotOutput("dateTimeListen"),
+          column(width = 6, highchartOutput("songBig4Plot1"), highchartOutput("songBig4Plot3")),
+          column(width = 6, highchartOutput("songBig4Plot2"), highchartOutput("songBig4Plot4")),
           highchartOutput("dateTimeListenNC")
         )
       ),
@@ -246,7 +247,8 @@ ui <- fluidPage(
                  mainPanel(
                    tableOutput("overall_artist_info"),
                    tableOutput("artist_song_info"),
-                   plotOutput("artist_big4"),
+                   column(width = 6, highchartOutput("artistBig4Plot1"), highchartOutput("artistBig4Plot3")),
+                   column(width = 6, highchartOutput("artistBig4Plot2"), highchartOutput("artistBig4Plot4")),
                    highchartOutput("dateTimeListenNCA")
                  )
                )
@@ -271,8 +273,9 @@ ui <- fluidPage(
                  mainPanel(
                    tableOutput("overall_album_info"),
                    tableOutput("album_info"),
-                 plotOutput("album_big4"),
-                 highchartOutput("dateTimeListenNCAl")
+                   column(width = 6, highchartOutput("albumBig4Plot1"), highchartOutput("albumBig4Plot3")),
+                   column(width = 6, highchartOutput("albumBig4Plot2"), highchartOutput("albumBig4Plot4")),
+                  highchartOutput("dateTimeListenNCAl")
                )
              ))),
     
@@ -666,53 +669,81 @@ server <- function(input, output, session) {
       select(MonthsOnBourgeoisie, LongestStreakOnBourgeoisie, CurrentStreakOnBourgeoisie)
   })
   
-  output$dateTimeListen <- renderPlot({
+  output$songBig4Plot1 <- renderHighchart({
     
-    p1 <- cln_subset() %>%
-      select(datenum, TimeInHours) %>%
-      filter(!is.na(TimeInHours)) %>%
-      ggplot(aes(x = datenum, y = TimeInHours)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
 
     
-    # tb <- cleaned %>%
-    #   filter(SongName == input$song_name) %>%
-    #   mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
-    #   select(datenum, TimeInHours) %>%
-    #   filter(!is.na(TimeInHours))
-    # hchart(
-    #   tb, "line",
-    #   hcaes(x =  datenum, y = TimeInHours),
-    #   showInLegend = TRUE,
-    #   name = "Hours"
-    # ) %>%
-    #   hc_title(text = "Cumulative Hours Listened Over Time")
+    p3 <- hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = RankOutOfN),
+      showInLegend = TRUE,
+      name = "Rank"
+    ) %>% 
+      hc_yAxis(reversed = TRUE)%>%
+      hc_title(text = "Overall Rank Over Time")
     
-    p2 <- cln_subset() %>%
-      select(datenum, TimeInPlays) %>%
-      filter(!is.na(TimeInPlays)) %>%
-      ggplot(aes(x = datenum, y = TimeInPlays)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Song Over Time")
+    p3
     
-    p3 <-  cln_subset() %>%
-      select(datenum, RankOutOfN) %>%
-      filter(!is.na(RankOutOfN)) %>%
-      ggplot(aes(x = datenum, y = RankOutOfN)) +
-      geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time") +
-      scale_y_reverse()
+
+  })
+  
+  output$songBig4Plot2 <- renderHighchart({
     
-    p4 <-  cln_subset() %>%
-      select(datenum, ValueOutOf1) %>%
-      filter(!is.na(ValueOutOf1)) %>%
-      ggplot(aes(x = datenum, y = ValueOutOf1)) +
-      geom_line() +
-      labs(x = "Date", y = "Song Value", title = "Overall Value of the Song Over Time")
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
     
+    p4 <- hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = ValueOutOf1),
+      showInLegend = TRUE,
+      name = "Value"
+    ) %>%
+      hc_title(text = "Overall Value Over Time")
     
-    p3 + p4 + p1 + p2
+    p4
+  })
+  
+  output$songBig4Plot3 <- renderHighchart({
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p1 <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInHours),
+      showInLegend = TRUE,
+      name = "Hours"
+    ) %>%
+      hc_title(text = "Cumulative Hours Listened Over Time")
+    
+    p1
+  })
+  
+  output$songBig4Plot4 <- renderHighchart({
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p2 <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInPlays),
+      showInLegend = TRUE,
+      name = "Hours"
+    ) %>%
+      hc_title(text = "Cumulative Plays Over Time")
+    
+    p2
   })
   
   
@@ -955,54 +986,85 @@ server <- function(input, output, session) {
       select(MaximumRank, SongCount)
   })
   
+
   
-  output$artist_big4 <- renderPlot({
-    p1a <- cln_artist_subset() %>%
-      select(datenum, TimeInHours) %>%
-      filter(!is.na(TimeInHours)) %>%
-      ggplot(aes(x = datenum, y = TimeInHours)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+  output$artistBig4Plot1 <- renderHighchart({
     
+    tb <- cleaned_artist %>%
+      filter(Artist == input$artist_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
     
-    p2a <- cln_artist_subset() %>%
-      select(datenum, TimeInPlays) %>%
-      filter(!is.na(TimeInPlays)) %>%
-      ggplot(aes(x = datenum, y = TimeInPlays)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Artist's Songs Over Time")
+    p3a <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = RankOutOfN),
+      showInLegend = TRUE,
+      name = "Rank"
+    ) %>%
+      hc_yAxis(reversed = TRUE) %>%
+      hc_title(text = "Overall Rank Over Time")
     
-    p3a <-  cln_artist_subset() %>%
-      select(datenum, RankOutOfN) %>%
-      filter(!is.na(RankOutOfN)) %>%
-      ggplot(aes(x = datenum, y = RankOutOfN)) +
-      geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Artist Over Time") +
-      scale_y_reverse()
+    p3a
+  })
+  
+  output$artistBig4Plot2 <- renderHighchart({
     
-    p4a <-  cln_artist_subset() %>%
-      select(datenum, ValueOutOf1) %>%
-      filter(!is.na(ValueOutOf1)) %>%
-      ggplot(aes(x = datenum, y = ValueOutOf1)) +
-      geom_line() +
-      labs(x = "Date", y = "Artist Value", title = "Overall Value of the Artist Over Time")
+    tb <- cleaned_artist %>%
+      filter(Artist == input$artist_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
     
+    p4a <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = ValueOutOf1),
+      showInLegend = TRUE,
+      name = "Value"
+    ) %>%
+      hc_title(text = "Overall Value Over Time")
     
-    p3a + p4a + p1a + p2a
+    p4a
+  })
+  
+  output$artistBig4Plot3 <- renderHighchart({
     
+    tb <- cleaned_artist %>%
+      filter(Artist == input$artist_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
     
+    p1a <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInHours),
+      showInLegend = TRUE,
+      name = "Plays"
+    ) %>%
+      hc_title(text = "Cumulative Hours Listened Over Time")
+    
+    p1a
+  })
+  
+  output$artistBig4Plot4 <- renderHighchart({
+    
+    tb <- cleaned_artist %>%
+      filter(Artist == input$artist_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p2a <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInPlays),
+      showInLegend = TRUE,
+      name = "Hours"
+    ) %>%
+      hc_title(text = "Cumulative Plays Over Time")
+    
+    p2a
   })
   
   
   output$dateTimeListenNCA <-
     renderHighchart({
       #non-cumulative listening hours
-      # cln_artist_subset() %>%
-      #   select(datenum, dHours) %>%
-      #   filter(!is.na(dHours)) %>%
-      #   ggplot(aes(x = datenum, y = dHours)) +
-      #   geom_line() +
-      #   labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
      
       
       tb <- cleaned_artist %>%
@@ -1060,44 +1122,82 @@ server <- function(input, output, session) {
   
   
   
-  output$album_big4 <- renderPlot({
-    p1al <- cln_album_subset() %>%
-      select(datenum, TimeInHours) %>%
-      filter(!is.na(TimeInHours)) %>%
-      ggplot(aes(x = datenum, y = TimeInHours)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+  output$albumBig4Plot1 <- renderHighchart({
     
+    tb <- cleaned_album %>%
+      filter(Album == input$album_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
     
-    p2al <- cln_album_subset() %>%
-      select(datenum, TimeInPlays) %>%
-      filter(!is.na(TimeInPlays)) %>%
-      ggplot(aes(x = datenum, y = TimeInPlays)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Album's Songs Over Time")
+    p3al <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = RankOutOfN),
+      showInLegend = TRUE,
+      name = "Rank"
+    ) %>%
+      hc_yAxis(reversed = TRUE) %>%
+      hc_title(text = "Overall Rank Over Time")
     
-    p3al <-  cln_album_subset() %>%
-      select(datenum, RankOutOfN) %>%
-      filter(!is.na(RankOutOfN)) %>%
-      ggplot(aes(x = datenum, y = RankOutOfN)) +
-      geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Album Over Time") +
-      scale_y_reverse()
+    p3al
+  })
+  
+  output$albumBig4Plot2 <- renderHighchart({
     
-    p4al <-  cln_album_subset() %>%
-      select(datenum, ValueOutOf1) %>%
-      filter(!is.na(ValueOutOf1)) %>%
-      ggplot(aes(x = datenum, y = ValueOutOf1)) +
-      geom_line() +
-      labs(x = "Date", y = "Album Value", title = "Overall Value of the Album Over Time")
+    tb <- cleaned_album %>%
+      filter(Album == input$album_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
     
+    p4al <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = ValueOutOf1),
+      showInLegend = TRUE,
+      name = "Value"
+    ) %>%
+      hc_title(text = "Overall Value Over Time")
     
-    p3al + p4al + p1al + p2al
+    p4al
+  })
+  
+  output$albumBig4Plot3 <- renderHighchart({
+    
+    tb <- cleaned_album %>%
+      filter(Album == input$album_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p1al <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInHours),
+      showInLegend = TRUE,
+      name = "Plays"
+    ) %>%
+      hc_title(text = "Cumulative Hours Listened Over Time")
+    
+    p1al
+  })
+  
+  output$albumBig4Plot4 <- renderHighchart({
+    
+    tb <- cleaned_album %>%
+      filter(Album == input$album_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p2al <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInPlays),
+      showInLegend = TRUE,
+      name = "Hours"
+    ) %>%
+      hc_title(text = "Cumulative Plays Over Time")
+    
+    p2al
   })
   
   
   output$dateTimeListenNCAl <-
-    renderPlot({
+    renderHighchart({
       #non-cumulative listening hours
       
       tb <- cleaned_album %>%
