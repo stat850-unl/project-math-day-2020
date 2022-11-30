@@ -117,7 +117,7 @@ ui <- fluidPage(
           tableOutput("song_big4"),
           tableOutput("bourgeoisie_song_info"),
           plotOutput("dateTimeListen"),
-          plotOutput("dateTimeListenNC")
+          highchartOutput("dateTimeListenNC")
         )
       ),
       
@@ -667,13 +667,27 @@ server <- function(input, output, session) {
   })
   
   output$dateTimeListen <- renderPlot({
+    
     p1 <- cln_subset() %>%
       select(datenum, TimeInHours) %>%
       filter(!is.na(TimeInHours)) %>%
       ggplot(aes(x = datenum, y = TimeInHours)) +
       geom_line() +
       labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
+
     
+    # tb <- cleaned %>%
+    #   filter(SongName == input$song_name) %>%
+    #   mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+    #   select(datenum, TimeInHours) %>%
+    #   filter(!is.na(TimeInHours))
+    # hchart(
+    #   tb, "line",
+    #   hcaes(x =  datenum, y = TimeInHours),
+    #   showInLegend = TRUE,
+    #   name = "Hours"
+    # ) %>%
+    #   hc_title(text = "Cumulative Hours Listened Over Time")
     
     p2 <- cln_subset() %>%
       select(datenum, TimeInPlays) %>%
@@ -704,14 +718,19 @@ server <- function(input, output, session) {
   
   
   output$dateTimeListenNC <-
-    renderPlot({
+    renderHighchart({
       #non-cumulative listening hours
-      cln_subset() %>%
-        select(datenum, dHours) %>%
-        filter(!is.na(dHours)) %>%
-        ggplot(aes(x = datenum, y = dHours)) +
-        geom_line() +
-        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date Added")
+      tb <- cleaned %>%
+        filter(SongName == input$song_name, !is.na(TimeInHours)) %>%
+        mutate(datenum = as.Date(dates, format = "%B %d %Y"))
+      
+      hchart(
+        tb, "line",
+        hcaes(x =  datenum, y = dHours),
+        showInLegend = TRUE,
+        name = "Hours"
+      ) %>%
+        hc_title(text = "Hours Listened by Date")
     })
   
   output$selectedArtist <- reactive(input$overallArtist_cell_clicked$value)
