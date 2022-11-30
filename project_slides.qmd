@@ -53,8 +53,45 @@ Miscellaneous:
 
 ## Methods and Analysis
 
-*   There was a lot of data, which was confusing and difficult to maneuver and nearly impossible to get any real information out of.
-*   
+*   There was **a lot** of data, which was confusing and difficult to maneuver and nearly impossible to get any real information out of.
+*  Following it's name, SAAM is broken into four major tabs:
+    *   Songs
+    *   Artists
+    *   Albumns
+    *   Miscellanious
+
+## Methods and Analysis : Songs
+
+* The "Songs" tab has three sub-tabs:
+    -   By Month
+        - returns a sortable table of songs based on chosen month and hours and plays ranges.
+    -   Individual Song Data
+        - given a selected song, returns order statistics for given song, as well plots of statistics over time.
+    -   Overall Song Data
+        - returns a sortable table of songs based on hours, plays, and date ranges.
+
+## Methods and Analysis : Artists
+
+* The "Artists" tab has two sub-tabs:
+    - Overall Artist Data
+        - returns a sortable table of artists based on hours, plays, and date ranges.
+    - Individual Artist Data
+        - given a selected artist, returns order statistics for given artist, as well plots of statistics over time.
+
+## Methods and Analysis : Albums
+
+* The "Albums" tab consists of one general tab
+    - This tab, given a selected artist, returns order statistics for given artist, as well plots of statistics over time.
+
+
+## Methods and Analysis : Miscellaneous
+
+* The "Miscellaneous" tab consists of two sub-tabs:
+    - Bourgeoisie by Month
+        - given a month and year, returns a table of all songs on the Bourgeoisie playlist at that time
+    - Overall Bourgeoisie Info
+        - returns a sortable table containing summary statistics for every song that has ever been put in the Bourgeoisie playlist.
+
 
 ## Discussion
 
