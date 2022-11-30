@@ -156,4 +156,4 @@ We would like to acknowledge the Shiny app "Living in the Lego World''. Signific
 *   [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf)
 *   [rsconnect](https://cran.r-project.org/web/packages/rsconnect/rsconnect.pdf)
 *   [DT](https://cran.r-project.org/web/packages/DT/DT.pdf)
-
+*   [highcharter](https://cran.r-project.org/web/packages/highcharter/highcharter.pdf)
