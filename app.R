@@ -247,7 +247,7 @@ ui <- fluidPage(
                    tableOutput("overall_artist_info"),
                    tableOutput("artist_song_info"),
                    plotOutput("artist_big4"),
-                   plotOutput("dateTimeListenNCA")
+                   highchartOutput("dateTimeListenNCA")
                  )
                )
              )),
@@ -272,7 +272,7 @@ ui <- fluidPage(
                    tableOutput("overall_album_info"),
                    tableOutput("album_info"),
                  plotOutput("album_big4"),
-                 plotOutput("dateTimeListenNCAl")
+                 highchartOutput("dateTimeListenNCAl")
                )
              ))),
     
@@ -976,17 +976,27 @@ server <- function(input, output, session) {
   
   
   output$dateTimeListenNCA <-
-    renderPlot({
+    renderHighchart({
       #non-cumulative listening hours
-      cln_artist_subset() %>%
-        select(datenum, dHours) %>%
-        filter(!is.na(dHours)) %>%
-        ggplot(aes(x = datenum, y = dHours)) +
-        geom_line() +
-        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
+      # cln_artist_subset() %>%
+      #   select(datenum, dHours) %>%
+      #   filter(!is.na(dHours)) %>%
+      #   ggplot(aes(x = datenum, y = dHours)) +
+      #   geom_line() +
+      #   labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
+     
+      
+      tb <- cleaned_artist %>%
+        filter(Artist == input$artist_name, !is.na(TimeInHours)) %>%
+        mutate(datenum = as.Date(dates, format = "%B %d %Y"))
 
-      
-      
+      hchart(
+        tb, "line",
+        hcaes(x =  datenum, y = dHours),
+        showInLegend = TRUE,
+        name = "Hours"
+      ) %>%
+        hc_title(text = "Hours Listened by Date")
       
     })
   
@@ -1070,12 +1080,19 @@ server <- function(input, output, session) {
   output$dateTimeListenNCAl <-
     renderPlot({
       #non-cumulative listening hours
-      cln_album_subset() %>%
-        select(datenum, dHours) %>%
-        filter(!is.na(dHours)) %>%
-        ggplot(aes(x = datenum, y = dHours)) +
-        geom_line() +
-        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date")
+      
+      tb <- cleaned_album %>%
+        filter(Album == input$album_name, !is.na(TimeInHours)) %>%
+        mutate(datenum = as.Date(dates, format = "%B %d %Y"))
+      
+      
+      hchart(
+        tb, "line",
+        hcaes(x =  datenum, y = dHours),
+        showInLegend = TRUE,
+        name = "Hours"
+      ) %>%
+        hc_title(text = "Hours Listened by Date")
     })
   
   
