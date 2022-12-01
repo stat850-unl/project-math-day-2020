@@ -1250,7 +1250,7 @@ server <- function(input, output, session) {
   
   output$overallBourgeoisie <- renderDataTable({
     overall_bour_stats()
-  })
+  },server=F,selection='single')
   
 }
 
