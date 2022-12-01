@@ -313,6 +313,7 @@ ui <- fluidPage(
 
 
 
+### SERVER ######
 
 server <- function(input, output, session) {
   ###### SONGS ###########
@@ -370,7 +371,7 @@ server <- function(input, output, session) {
              DateOfMaxRank = dates[rowN]) %>%
       filter(!is.na(TimeInHours)) %>%
       summarize(
-        MaximumRank = as.integer(max(MaxRank)),
+        MaximumRank = as.integer(first(MaxRank)),
         ArtistName = unique(Artist),
         AlbumName = unique(Album),
         DateAdded = dplyr::first(dates),
@@ -386,7 +387,8 @@ server <- function(input, output, session) {
   
   # overall
   output$overallSong <- renderDataTable({
-    if("Most Time Improved" == input$secondarySortingFilter){
+    
+  if("Most Time Improved" == input$secondarySortingFilter){
       
       if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
         subset_plays() %>%
@@ -436,7 +438,7 @@ server <- function(input, output, session) {
           arrange(desc(TotalTimeImprovement))
         
       }
-    }
+  }
     else if("Most Play Improved" == input$secondarySortingFilter){
       
       if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
