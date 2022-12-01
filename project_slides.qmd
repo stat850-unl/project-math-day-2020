@@ -1,19 +1,27 @@
 ---
 title: "Creating a Music Database with User-Friendly Interface via Shiny"
 author: "Charlie Bonk and Molly Creagar"
-format: revealjs
+format: 
+  revealjs:
+    theme: sky
+    #beige #solarized #moon
+    navigation-mode: vertical
 output:
   html_document:
     self-contained: true
 ---
 
-## Outline
+# Outline
 
-This presentation outlines the data and methods used to create a music database based on one person's listening history. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The database is housed at <https://mollyc.shinyapps.io/project-math-day-2020/>.
+This presentation outlines the data and methods used to create a music database based on one person's listening history. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The application can be found [here]( https://mollyc.shinyapps.io/project-math-day-2020/).
 
-## Introduction
+# What is SAAM
 
-## Data Description
+*   SAAM (Songs Artists Albums & Miscellaneous) is a data visualization R Shiny app. 
+*   The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delves into the data.
+*   The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment.
+
+# Data Description
 
 Data:
 
@@ -44,25 +52,78 @@ Miscellaneous:
 - also contains information about number of songs per months and consecutive months for each song on the playlist
 
 
-## Methods and Analysis
+# Methods and Analysis
+
+*   There was **a lot** of data, which was confusing and difficult to maneuver and nearly impossible to get any real information out of.
+*  Following it's name, SAAM is broken into four major tabs:
+    *   Songs
+    *   Artists
+    *   Albumns
+    *   Miscellanious
+
+## Methods and Analysis : Songs
+
+* The "Songs" tab has three sub-tabs:
+    -   By Month
+        - returns a sortable table of songs based on chosen month and hours and plays ranges.
+    -   Individual Song Data
+        - given a selected song, returns order statistics for given song, as well plots of statistics over time.
+    -   Overall Song Data
+        - returns a sortable table of songs based on hours, plays, and date ranges.
+
+## Methods and Analysis : Artists
+
+* The "Artists" tab has two sub-tabs:
+    - Overall Artist Data
+        - returns a sortable table of artists based on hours, plays, and date ranges.
+    - Individual Artist Data
+        - given a selected artist, returns order statistics for given artist, as well plots of statistics over time.
+
+## Methods and Analysis : Albums
+
+* The "Albums" tab consists of one general tab
+    - This tab, given a selected artist, returns order statistics for given artist, as well plots of statistics over time.
 
 
-## Discussion
+## Methods and Analysis : Miscellaneous
+
+* The "Miscellaneous" tab consists of two sub-tabs:
+    - Bourgeoisie by Month
+        - given a month and year, returns a table of all songs on the Bourgeoisie playlist at that time
+    - Overall Bourgeoisie Info
+        - returns a sortable table containing summary statistics for every song that has ever been put in the Bourgeoisie playlist.
 
 
+# Discussion
 
-## References
+* The app does a decent job at presenting the extreme amount of data in a simple, condensed, and user accessible manner.
+* 
+
+# Future Changes
+
+* While the app is in a good state now, there are things that were not possible due to time and knowledge.
+
+## Future Changes - Individual Information Buttons
+* Adding "Song Information", "Artist Information", and "Album Information" buttons.
+    - Allows user to select a song/artist/album in any sortable Data Table and immediately jump to the individual information tab for that selection.
+
+## Future Changes - Information Entree System
+* Currently, the data is stored in .csv files that had to be cleaned and manipulated from their original state.
+* We want to implement, either in this app or another, a way for an authorized user to input updated data from future months so that the input will save to a .csv file in the correct manner so that the app will continue to work in the future with new data.
+
+# References
 
 We would like to acknowledge the Shiny app ``Living in the Lego World''. Significant portions of the user interface were modelled after this app. Full citation: Kaplan, A (2019). _Living in the Lego World_. <https://shiny.rstudio.com/gallery/lego-world.html>
 
 ## References
-
-R Packages Used:
+### R Packages Used:
 
 *   shiny
 *   shinythemes
 *   tidyverse 
 *   patchwork
 *   rsconnect
+*   DT
+*   highcharter
 
 
