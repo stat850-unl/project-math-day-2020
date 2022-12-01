@@ -97,7 +97,14 @@ Miscellaneous:
 # Discussion
 
 * The app does a decent job at presenting the extreme amount of data in a simple, condensed, and user accessible manner.
-* 
+
+## Discussion
+
+* The reactivity of the app is very useful and surprisingly fast for the amount of data needed to run the app. 
+
+## Discussion
+
+* The owner of the data had a lot of say in the organization and structure of the app. This was a valuable experience in working with a client who didn't have experience with what was possible in a Shiny app.
 
 # Future Changes
 
