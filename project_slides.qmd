@@ -1,26 +1,27 @@
 ---
 title: "Creating a Music Database with User-Friendly Interface via Shiny"
 author: "Charlie Bonk and Molly Creagar"
-format:
+format: 
   revealjs:
     theme: sky
     #beige #solarized #moon
+    navigation-mode: vertical
 output:
   html_document:
     self-contained: true
 ---
 
-## Outline
+# Outline
 
 This presentation outlines the data and methods used to create a music database based on one person's listening history. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The application can be found [here]( https://mollyc.shinyapps.io/project-math-day-2020/).
 
-## What is SAAM
+# What is SAAM
 
 *   SAAM (Songs Artists Albums & Miscellaneous) is a data visualization R Shiny app. 
 *   The main purpose of the app is to allow a user to easily search through years of collected listening data of one user and take their own deeper delves into the data.
 *   The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment.
 
-## Data Description
+# Data Description
 
 Data:
 
@@ -51,7 +52,7 @@ Miscellaneous:
 - also contains information about number of songs per months and consecutive months for each song on the playlist
 
 
-## Methods and Analysis
+# Methods and Analysis
 
 *   There was **a lot** of data, which was confusing and difficult to maneuver and nearly impossible to get any real information out of.
 *  Following it's name, SAAM is broken into four major tabs:
@@ -93,11 +94,11 @@ Miscellaneous:
         - returns a sortable table containing summary statistics for every song that has ever been put in the Bourgeoisie playlist.
 
 
-## Discussion
+# Discussion
 
 
 
-## References
+# References
 
 We would like to acknowledge the Shiny app ``Living in the Lego World''. Significant portions of the user interface were modelled after this app. Full citation: Kaplan, A (2019). _Living in the Lego World_. <https://shiny.rstudio.com/gallery/lego-world.html>
 
