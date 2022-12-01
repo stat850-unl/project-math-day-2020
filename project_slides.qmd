@@ -18,7 +18,7 @@ This presentation outlines the data and methods used to create a music database 
 # What is SAAM
 
 *   SAAM (Songs Artists Albums & Miscellaneous) is a data visualization R Shiny app. 
-*   The main purpose of the app is to allow a user to easily search through years of collected listening data of one user and take their own deeper delves into the data.
+*   The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delves into the data.
 *   The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment.
 
 # Data Description
@@ -96,7 +96,20 @@ Miscellaneous:
 
 # Discussion
 
+* The app does a decent job at presenting the extreme amount of data in a simple, condensed, and user accessible manner.
+* 
 
+# Future Changes
+
+* While the app is in a good state now, there are things that were not possible due to time and knowledge.
+
+## Future Changes - Individual Information Buttons
+* Adding "Song Information", "Artist Information", and "Album Information" buttons.
+    - Allows user to select a song/artist/album in any sortable Data Table and immediately jump to the individual information tab for that selection.
+
+## Future Changes - Information Entree System
+* Currently, the data is stored in .csv files that had to be cleaned and manipulated from their original state.
+* We want to implement, either in this app or another, a way for an authorized user to input updated data from future months so that the input will save to a .csv file in the correct manner so that the app will continue to work in the future with new data.
 
 # References
 
