@@ -49,6 +49,7 @@ Artists/Albums:
 Miscellaneous:
 
 - tracks which songs are added to a particular playlist (the playlist "Bourgeoisie")
+- Bourgeoisie is a playlist used to track songs currently considered "the best" in the music library
 - also contains information about number of songs per months and consecutive months for each song on the playlist
 
 
@@ -114,13 +115,14 @@ Miscellaneous:
 * Adding "Song Information", "Artist Information", and "Album Information" buttons.
     - Allows user to select a song/artist/album in any sortable Data Table and immediately jump to the individual information tab for that selection.
 
-## Future Changes - Information Entree System
+## Future Changes - Information Entry System
 * Currently, the data is stored in .csv files that had to be cleaned and manipulated from their original state.
 * We want to implement, either in this app or another, a way for an authorized user to input updated data from future months so that the input will save to a .csv file in the correct manner so that the app will continue to work in the future with new data.
 
 # References
 
 We would like to acknowledge the Shiny app ``Living in the Lego World''. Significant portions of the user interface were modelled after this app. Full citation: Kaplan, A (2019). _Living in the Lego World_. <https://shiny.rstudio.com/gallery/lego-world.html>
+
 
 ## References
 ### R Packages Used:
