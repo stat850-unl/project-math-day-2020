@@ -6,22 +6,25 @@ format: html
 
 ## Abstract:
 
-This report outlines the data and methods used to create a music database based on one person's listening history. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The database is housed at <https://mollyc.shinyapps.io/project-math-day-2020/>.
+This report outlines the data and methods used to create a music database based on one person's listening history. The database was built using R Shiny. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The database is housed at <https://mollyc.shinyapps.io/project-math-day-2020/>.
 
 ### Keywords:
 
-music database, shiny app, R
+music database, Shiny app, R
 
 ## Introduction
 
+This report outlines the data and methods used to create a music database based on one person's listening history. We called the music database SAAM (Songs Artists Albums & Miscellaneous). SAAM is a data visualization R Shiny app. The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delve into the data. 
+
+The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment. This interactivity was introduced through the use of multiple R packages and a user-friendly layout and interface.
 
 
 
 ## Data Description
 
-The data consists of a collection of multiple Google sheets tracking one person's listening history. There are more than 2100 songs in the data used, with multiple observations for each song. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though there are some missed months and not every observation is made on the last day of the month.
+The data consists of a collection of multiple Google sheets tracking one person's listening history. An observation consists of the previous month's listening statistics for a particular song. Observations are recorded approximately once a month, though there are some missed months and not every observation is made on the last day of the month. The data dates back to August 2013, so there is almost a full decade of statistics.
 
-Variables recorded in the Songs dataset include: 
+There are more than 2100 songs in the data used, with multiple observations for each song. Variables recorded in the Songs dataset include: 
 
 - SongID (a unique identifying number), 
 - 24hrMark (the month after the data collection started when the song passed 24 hours of play time), 
@@ -43,7 +46,9 @@ Variables recorded in the Songs dataset include:
 - Artist (name of the artist), and 
 - Album (name of the album).
 
-Similar variables and metrics are tracked in the Artist and Album datasets.
+Similar variables and metrics are tracked in the Artist and Album datasets. For these, any song that was logged in the Songs data had its artist and album logged in the Artist and Album data. 
+
+The Miscellaneous data includes information and statistics about things that do not cleanly fall under the Song, Artist, and Album umbrellas. The main item found in the Miscellaneous data is information and statistics on a particular playlist: "Bourgeoisie". This playlist is used to track songs that are currently, and somewhat subjectively, considered the best in the music library. The playlist is subject to change every month, so which months each song was on the playlist is recorded. Summary statistics are also recorded, such as the number of months each song is featured on the playlist, the longest streak of months in a row that each song has been on the playlist, and the current streak of months in a row that the song has been on the playlist.
 
 ## Methods and Analysis
 
@@ -142,6 +147,16 @@ The Miscellaneous tab tracks the songs on a playlist named "Bourgeoisie" created
 
 
 ## Discussion
+
+The SAAM Shiny app presents the data in a simple, condensed, user-friendly manner. Viewing the large amount of data in a visual and interactive way makes the statistics and information accessible to any user interesting in exploring the data. This format also makes it much easier for the owner of the data to view the statistics and history, compared to sorting or filtering using Google Sheets.
+
+The app is also highly reactive and interactive. When the webpage is initially loading, it may take 20 to 30 seconds to fully load; however, after that, any new item clicked or tab opened takes a second or less to load and become interactive. We also implemented interactivity in the graphs through the use of the highcharter R package. By hovering over a particular data point, the value and date the value was logged appears. This is very useful for the owner and anyone else interested in looking at the statistics.
+
+This project was a very valuable experience in terms of learning how to work with a client and use the Shiny app structure and library. We took a lot of input about organization and structure of the app from the owner of the data. Some of the requests about the Shiny app had to be tailored to fit the parameters of what was possible with a Shiny app (to our knowledge, of course). It was also a good experience to have in regards to learning how to take a thought on some component of the data and what should be shown and turn it into an attribute of a Shiny app.
+
+### Future Work
+
+In future iterations of this app, we would like to be able to implement some sort of user input app or information entry system. This could be a standalone thing or part of SAAM. Currently, the data is stored in Google Sheets, which then have to be downloaded to csv files, cleaned, and then read into SAAM. It would be really handy if we were able to expedite this process for the owner, and he was able to enter the data directly into SAAM and have it stored in a csv file in the correct format automatically.
 
 
 ## Appendix

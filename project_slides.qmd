@@ -59,8 +59,8 @@ Miscellaneous:
 *  Following it's name, SAAM is broken into four major tabs:
     *   Songs
     *   Artists
-    *   Albumns
-    *   Miscellanious
+    *   Albums
+    *   Miscellaneous
 
 ## Methods and Analysis : Songs
 
