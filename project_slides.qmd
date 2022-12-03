@@ -109,11 +109,12 @@ Miscellaneous:
 
 # Future Changes
 
-* While the app is in a good state now, there are things that were not possible due to time and knowledge.
+* While the app is in a good state now, there are things that were not possible due to time and knowledge of the many supplementary packages for R Shiny.
 
 ## Future Changes - Individual Information Buttons
 * Adding "Song Information", "Artist Information", and "Album Information" buttons.
     - Allows user to select a song/artist/album in any sortable Data Table and immediately jump to the individual information tab for that selection.
+* This function is partially integrated and should be fuly functional on release. 
 
 ## Future Changes - Information Entry System
 * Currently, the data is stored in .csv files that had to be cleaned and manipulated from their original state.
