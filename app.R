@@ -114,6 +114,7 @@ ui <- fluidPage(
         
         mainPanel(
           tableOutput("song_info"),
+          tableOutput("song_max_info"),
           tableOutput("song_big4"),
           tableOutput("bourgeoisie_song_info"),
           column(width = 6, highchartOutput("songBig4Plot1"), highchartOutput("songBig4Plot3")),
@@ -366,16 +367,21 @@ server <- function(input, output, session) {
     
     cleaned %>%
       filter(SongName == input$song_name) %>%
+      filter(!is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              rowN = first(which(RankOutOfN == MaxRank)),
-             DateOfMaxRank = dates[rowN]) %>%
-      filter(!is.na(TimeInHours)) %>%
+             DateOfMaxRank = dates[rowN],
+             rowD = first(which(dHours == max(dHours))),
+             Max_dHours = dHours[rowD],
+             DateOfMaxdHours = dates[rowD]) %>%
       summarize(
         MaximumRank = as.integer(first(MaxRank)),
         ArtistName = unique(Artist),
         AlbumName = unique(Album),
         DateAdded = dplyr::first(dates),
-        DateOfMaxRank = first(DateOfMaxRank)
+        DateOfMaxRank = first(DateOfMaxRank),
+        DateOfMaxdHours = first(DateOfMaxdHours),
+        Max_dHours = first(Max_dHours)
       ) %>%
       mutate(MonthsOnBourgeoisie = as.integer(subBour$NumberOfMonths),
              LongestStreakOnBourgeoisie = as.integer(subBour$LongestStreak),
@@ -656,7 +662,12 @@ server <- function(input, output, session) {
   # individual
   output$song_info <- renderTable({
     cln_subset_overall_info() %>%
-      select(MaximumRank, DateOfMaxRank, ArtistName, AlbumName, DateAdded) #need to add date of max rank
+      select(MaximumRank, DateOfMaxRank, ArtistName, AlbumName, DateAdded)
+  })
+  
+  output$song_max_info <- renderTable({
+    cln_subset_overall_info() %>%
+      select(Max_dHours, DateOfMaxdHours) 
   })
   
   output$song_big4 <- renderTable({
@@ -959,8 +970,13 @@ server <- function(input, output, session) {
     cleaned_artist %>%
       filter(Artist == input$artist_name) %>%
       filter(!is.na(TimeInHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"),
+             MaxRank = as.integer(MaxRank),
+             rowN = first(which(RankOutOfN == MaxRank)),
+             DateOfMaxRank = dates[rowN]) %>%
       summarize(MaximumRank = as.integer(max(MaxRank)),
-                SongCount = as.integer(max(SongCount)))
+                SongCount = as.integer(max(SongCount)),
+                DateOfMaxRank = first(DateOfMaxRank))
   })
   
   
@@ -985,7 +1001,7 @@ server <- function(input, output, session) {
   
   output$overall_artist_info <- renderTable({
     cln_artist_overall_info() %>%
-      select(MaximumRank, SongCount)
+      select(MaximumRank, DateOfMaxRank, SongCount)
   })
   
 
