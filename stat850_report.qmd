@@ -14,7 +14,7 @@ music database, Shiny app, R
 
 ## Introduction
 
-This report outlines the data and methods used to create a music database based on one person's listening history. We called the music database SAAM (Songs Artists Albums & Miscellaneous). SAAM is a data visualization R Shiny app. The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delve into the data. 
+This report outlines the data and methods used to create a music database based on one person's listening history. We called the music database SAAM (Songs, Artists, Albums, and Miscellaneous). SAAM is a data visualization R Shiny app. The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delve into the data. 
 
 The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment. This interactivity was introduced through the use of multiple R packages and a user-friendly layout and interface.
 
