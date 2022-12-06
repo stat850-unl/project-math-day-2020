@@ -58,9 +58,53 @@ The main goal of the application is to present the data to a viewer in a clean, 
 For Songs, there are three sub-tabs that the user can use to investigate the data set. These will be for by month data, individual statistcs, and overall statistics.  "Individual" aims to give a deeper look at any specific song and how it has performed during its time being listened to. The code below gives is everything that will be shown to the user.
 
 ```{r,eval=F, messages=F}
-output$song_info <- renderTable({
+
+ song_static_info <- reactive({
+    cleaned %>%
+      filter(SongName == input$song_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      summarise(ArtistName = unique(Artist),
+            AlbumName = unique(Album),
+            DateAdded = dplyr::first(dates))
+  })
+  
+  cln_subset_overall_info <- reactive({
+    
+    subBour <- db_misc %>%
+      filter(SongName == input$song_name)
+    
+    
+    cleaned %>%
+      filter(SongName == input$song_name) %>%
+      filter(!is.na(TimeInHours), !is.na(dHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y"),
+             rowN = first(which(RankOutOfN == MaxRank)),
+             DateOfMaxRank = dates[rowN],
+             rowD = first(which(dHours == max(dHours))),
+             Max_dHours = dHours[rowD],
+             DateOfMaxdHours = dates[rowD]) %>%
+      summarize(
+        MaximumRank = as.integer(first(MaxRank)),
+        DateOfMaxRank = first(DateOfMaxRank),
+        DateOfMaxdHours = first(DateOfMaxdHours),
+        Max_dHours = first(Max_dHours)
+      ) %>%
+      mutate(MonthsOnBourgeoisie = as.integer(subBour$NumberOfMonths),
+             LongestStreakOnBourgeoisie = as.integer(subBour$LongestStreak),
+             CurrentStreakOnBourgeoisie = as.integer(subBour$CurrentStreak))
+      
+  })
+ 
+  
+  output$song_info <- renderTable({
+    song_static_info() %>%
+      select(ArtistName, AlbumName, DateAdded)
+  })
+  
+  output$song_max_info <- renderTable({
     cln_subset_overall_info() %>%
-      select(MaximumRank, ArtistName, AlbumName)
+      select(MaximumRank, DateOfMaxRank, Max_dHours, DateOfMaxdHours) 
   })
   
   output$song_big4 <- renderTable({
@@ -70,54 +114,106 @@ output$song_info <- renderTable({
       select(RankOutOfN, ValueOutOf1, TimeInHours, TimeInPlays)
   })
   
-
-  
-  output$dateTimeListen <- renderPlot({
-    
-    p1 <- cln_subset() %>%
-      select(datenum, TimeInHours) %>%
-      filter(!is.na(TimeInHours)) %>%
-      ggplot(aes(x = datenum, y = TimeInHours)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Hours Listened", title = "Cumulative Hours Listened Over Time")
-    
-    
-    p2 <- cln_subset() %>%
-      select(datenum, TimeInPlays) %>%
-      filter(!is.na(TimeInPlays)) %>%
-      ggplot(aes(x = datenum, y = TimeInPlays)) +
-      geom_line() +
-      labs(x = "Date", y = "Cumulative Plays", title = "Cumulative Plays of the Song Over Time")
-    
-    p3 <-  cln_subset() %>%
-      select(datenum, RankOutOfN) %>%
-      filter(!is.na(RankOutOfN)) %>%
-      ggplot(aes(x = datenum, y = RankOutOfN)) +
-      geom_line() +
-      labs(x = "Date", y = "Overall Rank", title = "Overall Rank of the Song Over Time")
-      
-    p4 <-  cln_subset() %>%
-      select(datenum, ValueOutOf1) %>%
-      filter(!is.na(ValueOutOf1)) %>%
-      ggplot(aes(x = datenum, y = ValueOutOf1)) +
-      geom_line() +
-      labs(x = "Date", y = "Song Value", title = "Overall Value of the Song Over Time")
-    
-    
-    p3 + p4 + p1 + p2
+  output$bourgeoisie_song_info <- renderTable({
+    cln_subset_overall_info() %>%
+      select(MonthsOnBourgeoisie, LongestStreakOnBourgeoisie, CurrentStreakOnBourgeoisie)
   })
   
 
   
+  output$songBig4Plot1 <- renderHighchart({
+    
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+
+    
+    p3 <- hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = RankOutOfN),
+      showInLegend = TRUE,
+      name = "Rank"
+    ) %>% 
+      hc_yAxis(reversed = TRUE)%>%
+      hc_title(text = "Overall Rank Over Time")
+    
+    p3
+    
+
+  })
+  
+  output$songBig4Plot2 <- renderHighchart({
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p4 <- hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = ValueOutOf1),
+      showInLegend = TRUE,
+      name = "Value"
+    ) %>%
+      hc_title(text = "Overall Value Over Time")
+    
+    p4
+  })
+  
+  output$songBig4Plot3 <- renderHighchart({
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p1 <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInHours),
+      showInLegend = TRUE,
+      name = "Hours"
+    ) %>%
+      hc_title(text = "Cumulative Hours Listened Over Time")
+    
+    p1
+  })
+  
+  output$songBig4Plot4 <- renderHighchart({
+    
+    tb <- cleaned %>%
+      filter(SongName == input$song_name) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      filter(!is.na(TimeInHours))
+    
+    p2 <-  hchart(
+      tb, "line",
+      hcaes(x =  datenum, y = TimeInPlays),
+      showInLegend = TRUE,
+      name = "Hours"
+    ) %>%
+      hc_title(text = "Cumulative Plays Over Time")
+    
+    p2
+  })
+  
+  
+  
   output$dateTimeListenNC <-
-    renderPlot({
+    renderHighchart({
       #non-cumulative listening hours
-      cln_subset() %>%
-        select(datenum, dHours) %>%
-        filter(!is.na(dHours)) %>%
-        ggplot(aes(x = datenum, y = dHours)) +
-        geom_line() +
-        labs(x = "Date", y = "Hours Listened By Date", title = "Hours Listened by Date Added")
+      tb <- cleaned %>%
+        filter(SongName == input$song_name, !is.na(TimeInHours)) %>%
+        mutate(datenum = as.Date(dates, format = "%B %d %Y"))
+      
+      hchart(
+        tb, "line",
+        hcaes(x =  datenum, y = dHours),
+        showInLegend = TRUE,
+        name = "Hours"
+      ) %>%
+        hc_title(text = "Hours Listened by Date")
     })
 ```
 
@@ -136,7 +232,7 @@ This code will take a song name and return the following:
   *   Overall rank of the song over time
   *   Overall value of the song over time
   *   Cumulative hours listened over time
-  *   Cumulative plats of the song over time
+  *   Cumulative plays of the song over time
   *   Hours listened by date added
 
 "Overall" aims to encapsulate data about all songs. The user will be able to sort and filter their data. Each song will be hyperlinked to the individual song data page. Examples of the by month, individual, and overall pages are shown below.
@@ -148,7 +244,29 @@ This code will take a song name and return the following:
 
 The second page would automatically generate if the user clicks on "Instant Crush (feat. Julian Casablancas)" in the "By Month" tab or "Overall Song Data" tab.
 
-Artists and Albums tabs will follow closely to Songs regarding the content.
+Artists and Albums tabs follow closely to Songs regarding the content. For the Artist tab, two sub-tabs are shown: "Overall Artist Data" and "Individual Artist Data". These are nearly the same as the corresponding Song tabs, with the "Overall Artist Data" sub-tab having the ability to filter by total hours or plays along with date ranges, and the "Individual Artist Data" taking an artist name and displaying the following:
+
+1. Maximum Rank and Date Maximum Rank was achieved
+2. Song Count
+3. All songs with the song's album name and maximum rank
+4. 5 different plots, covering:
+  *   Overall rank of the artist over time
+  *   Overall value of the artist over time
+  *   Cumulative hours listened over time
+  *   Cumulative plays of the artist over time
+  *   Hours listened by date added
+  
+Currently, the album tab only lists "Individual Album Data". There is minimal information shown currently, which the owner of the data had said was expected and reasonable. A user can select an album name and see the following output:
+
+
+1. Song Count
+3. All songs from that album with the artist name and maximum rank of the song
+4. 5 different plots, covering:
+  *   Overall rank of the album over time
+  *   Overall value of the album over time
+  *   Cumulative hours listened over time
+  *   Cumulative plays of the album over time
+  *   Hours listened by date added
 
 The Miscellaneous tab tracks the songs on a playlist named "Bourgeoisie" created by the owner of the listening history data. This playlist is updated each month based on how much the owner is subjectively enjoying songs. So, the amount of time a song stays on the playlist is a metric of how enjoyable the song is to the owner, to some extent.
 
@@ -165,12 +283,15 @@ This project was a very valuable experience in terms of learning how to work wit
 
 In future iterations of this app, we would like to be able to implement some sort of user input app or information entry system. This could be a standalone thing or part of SAAM. Currently, the data is stored in Google Sheets, which then have to be downloaded to csv files, cleaned, and then read into SAAM. It would be really handy if we were able to expedite this process for the owner, and he was able to enter the data directly into SAAM and have it stored in a csv file in the correct format automatically.
 
-There are also some items on the SAAM wishlist that we did not get to due to time constraints, so it would be valuable to add these items if future work was being done on the app. For example, EXAMPLE
+There are also some items on the SAAM wishlist that we did not get to due to time constraints, so it would be valuable to add these items if future work was being done on the app. For example, the owner of the data suggested that it would be nice (but not necessary) to have Bourgeoisie streak information in relation to artist. This streak would look across all songs on the playlist, group by artist, and form a streak count based on which of the artist's songs appeared on the playlist each month.
+
 
 
 ## Appendix
 ### Accreditations
 We would like to acknowledge the Shiny app "Living in the Lego World''. Significant portions of the user interface were modeled after this app. Full citation: Kaplan, A (2019). _Living in the Lego World_. <https://shiny.rstudio.com/gallery/lego-world.html>
+
+We would also like to thank Sam Macdonald for allowing us to use his music listening history data and providing metrics for what he would want in a music app. His feedback and ideas for organization were very helpful in understanding how our app should look and function.
 
 ### R Packages Used:
 
