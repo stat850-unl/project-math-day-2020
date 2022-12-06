@@ -26,7 +26,6 @@ library(patchwork)
 library(DT)
 library(highcharter)
 
-
 cleaned <- readr::read_csv("data/cleaned.csv")
 cleaned_artist <- readr::read_csv("data/cleaned_artist.csv")
 cleaned_album <- readr::read_csv("data/cleaned_album.csv")
@@ -114,8 +113,8 @@ ui <- fluidPage(
         
         mainPanel(
           tableOutput("song_info"),
-          tableOutput("song_max_info"),
           tableOutput("song_big4"),
+          tableOutput("song_max_info"),
           tableOutput("bourgeoisie_song_info"),
           column(width = 6, highchartOutput("songBig4Plot1"), highchartOutput("songBig4Plot3")),
           column(width = 6, highchartOutput("songBig4Plot2"), highchartOutput("songBig4Plot4")),
@@ -359,6 +358,16 @@ server <- function(input, output, session) {
       mutate(datenum = as.Date(dates, format = "%B %d %Y"))
   })
   
+  song_static_info <- reactive({
+    cleaned %>%
+      filter(SongName == input$song_name) %>%
+      filter(!is.na(TimeInHours)) %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      summarise(ArtistName = unique(Artist),
+            AlbumName = unique(Album),
+            DateAdded = dplyr::first(dates))
+  })
+  
   cln_subset_overall_info <- reactive({
     
     subBour <- db_misc %>%
@@ -376,9 +385,6 @@ server <- function(input, output, session) {
              DateOfMaxdHours = dates[rowD]) %>%
       summarize(
         MaximumRank = as.integer(first(MaxRank)),
-        ArtistName = unique(Artist),
-        AlbumName = unique(Album),
-        DateAdded = dplyr::first(dates),
         DateOfMaxRank = first(DateOfMaxRank),
         DateOfMaxdHours = first(DateOfMaxdHours),
         Max_dHours = first(Max_dHours)
@@ -661,13 +667,13 @@ server <- function(input, output, session) {
   
   # individual
   output$song_info <- renderTable({
-    cln_subset_overall_info() %>%
-      select(MaximumRank, DateOfMaxRank, ArtistName, AlbumName, DateAdded)
+    song_static_info() %>%
+      select(ArtistName, AlbumName, DateAdded)
   })
   
   output$song_max_info <- renderTable({
     cln_subset_overall_info() %>%
-      select(Max_dHours, DateOfMaxdHours) 
+      select(MaximumRank, DateOfMaxRank, Max_dHours, DateOfMaxdHours) 
   })
   
   output$song_big4 <- renderTable({
@@ -782,7 +788,8 @@ server <- function(input, output, session) {
                                                          'artists',
                                                          selected = "Individual Artist Data")})
   
-  # by month
+  
+  ## by month
   output$monthSong <- renderDataTable({
     if("Most Time Improved" == input$secondarySortingFilterMonth){
       if(("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
