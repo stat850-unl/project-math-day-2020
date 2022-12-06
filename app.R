@@ -48,7 +48,7 @@ ui <- fluidPage(
         id = 'songs',
         type = "tabs",
         
-      
+        
         tabPanel(
           "By Month",
           
@@ -95,33 +95,32 @@ ui <- fluidPage(
             )
             ,actionButton('jumpToIndivSongM', "Song Information")
           ),
-          mainPanel(dataTableOutput("monthSong"),
-                    verbatimTextOutput('selectedSongM'))
-      ),
+          mainPanel(dataTableOutput("monthSong"))
+        ),
         
-      tabPanel(
-        "Individual Song Data",
-        
-        sidebarPanel(
-          selectizeInput(
-            "song_name",
-            "Song Name",
-            choices = sort(unique(cleaned$SongName)),
-            selected = "Instant Crush (feat. Julian Casablancas)"
+        tabPanel(
+          "Individual Song Data",
+          
+          sidebarPanel(
+            selectizeInput(
+              "song_name",
+              "Song Name",
+              choices = sort(unique(cleaned$SongName)),
+              selected = "Instant Crush (feat. Julian Casablancas)"
+            )
+          ),
+          
+          mainPanel(
+            tableOutput("song_info"),
+            tableOutput("song_big4"),
+            tableOutput("song_max_info"),
+            tableOutput("bourgeoisie_song_info"),
+            column(width = 6, highchartOutput("songBig4Plot1"), highchartOutput("songBig4Plot3")),
+            column(width = 6, highchartOutput("songBig4Plot2"), highchartOutput("songBig4Plot4")),
+            highchartOutput("dateTimeListenNC")
           )
         ),
         
-        mainPanel(
-          tableOutput("song_info"),
-          tableOutput("song_big4"),
-          tableOutput("song_max_info"),
-          tableOutput("bourgeoisie_song_info"),
-          column(width = 6, highchartOutput("songBig4Plot1"), highchartOutput("songBig4Plot3")),
-          column(width = 6, highchartOutput("songBig4Plot2"), highchartOutput("songBig4Plot4")),
-          highchartOutput("dateTimeListenNC")
-        )
-      ),
-      
         tabPanel(
           "Overall Song Data",
           
@@ -177,12 +176,11 @@ ui <- fluidPage(
             actionButton('jumpToIndivSongO', "Song Information")
           ),
           
-          mainPanel(dataTableOutput("overallSong"),
-                    verbatimTextOutput('selectedSongO'))
+          mainPanel(dataTableOutput("overallSong"))
         )
       )
-        
-        
+      
+      
     ),
     
     
@@ -227,8 +225,7 @@ ui <- fluidPage(
                    actionButton('jumpToIndivArtist', "Artist Information")
                    
                  ),
-                 mainPanel(dataTableOutput("overallArtist"),
-                           verbatimTextOutput('selectedArtist'))
+                 mainPanel(dataTableOutput("overallArtist"))
                  
                ),
                
@@ -260,7 +257,7 @@ ui <- fluidPage(
              tabsetPanel(
                type = "tabs",
                tabPanel(
-                 "Individual Album Data",
+                 "Album Info",
                  sidebarPanel(
                    selectizeInput(
                      "album_name",
@@ -275,9 +272,9 @@ ui <- fluidPage(
                    tableOutput("album_info"),
                    column(width = 6, highchartOutput("albumBig4Plot1"), highchartOutput("albumBig4Plot3")),
                    column(width = 6, highchartOutput("albumBig4Plot2"), highchartOutput("albumBig4Plot4")),
-                  highchartOutput("dateTimeListenNCAl")
-               )
-             ))),
+                   highchartOutput("dateTimeListenNCAl")
+                 )
+               ))),
     
     
     tabPanel("Miscellaneous",
@@ -299,13 +296,13 @@ ui <- fluidPage(
                              tableOutput("month_songs_bourgeoisie")
                            )
                          ),
-                           tabPanel(
-                             "Overall Bourgeoisie Info",
-                             
-                             mainPanel(
-                               dataTableOutput("overallBourgeoisie")
-                             )
-                             
+                         tabPanel(
+                           "Overall Bourgeoisie Info",
+                           
+                           mainPanel(
+                             dataTableOutput("overallBourgeoisie")
+                           )
+                           
                          ))
     )    
   )
@@ -331,19 +328,19 @@ server <- function(input, output, session) {
   })
   
   subset_plays <- reactive({
-      cleaned %>%
-        mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
-        group_by(SongID) %>%
-        filter(!is.na(TimeInHours)) %>%
-        mutate(DateAdded = min(datenum)) %>%
-        ungroup() %>%
-        filter(
-          TimeInHours >= input$topHrs[1],
-          TimeInHours <= input$topHrs[2],
-          TimeInPlays >= input$topPlayed[1],
-          TimeInPlays <= input$topPlayed[2],
-          DateAdded >= as.Date(input$song_date_range[1]),
-          DateAdded <= as.Date(input$song_date_range[2])
+    cleaned %>%
+      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
+      group_by(SongID) %>%
+      filter(!is.na(TimeInHours)) %>%
+      mutate(DateAdded = min(datenum)) %>%
+      ungroup() %>%
+      filter(
+        TimeInHours >= input$topHrs[1],
+        TimeInHours <= input$topHrs[2],
+        TimeInPlays >= input$topPlayed[1],
+        TimeInPlays <= input$topPlayed[2],
+        DateAdded >= as.Date(input$song_date_range[1]),
+        DateAdded <= as.Date(input$song_date_range[2])
       )  %>%
       group_by(SongID) %>%
       mutate(DateOfOccurrence = last(dates)) %>%
@@ -364,8 +361,8 @@ server <- function(input, output, session) {
       filter(!is.na(TimeInHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
       summarise(ArtistName = unique(Artist),
-            AlbumName = unique(Album),
-            DateAdded = dplyr::first(dates))
+                AlbumName = unique(Album),
+                DateAdded = dplyr::first(dates))
   })
   
   cln_subset_overall_info <- reactive({
@@ -392,14 +389,15 @@ server <- function(input, output, session) {
       mutate(MonthsOnBourgeoisie = as.integer(subBour$NumberOfMonths),
              LongestStreakOnBourgeoisie = as.integer(subBour$LongestStreak),
              CurrentStreakOnBourgeoisie = as.integer(subBour$CurrentStreak))
-      
+    
+    
   })
   
   
   # overall
   output$overallSong <- renderDataTable({
     
-  if("Most Time Improved" == input$secondarySortingFilter){
+    if("Most Time Improved" == input$secondarySortingFilter){
       
       if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
         subset_plays() %>%
@@ -449,7 +447,7 @@ server <- function(input, output, session) {
           arrange(desc(TotalTimeImprovement))
         
       }
-  }
+    }
     else if("Most Play Improved" == input$secondarySortingFilter){
       
       if(("Album" %in% input$tertiarySortingFilter) & ("Artist" %in% input$tertiarySortingFilter)){
@@ -652,17 +650,9 @@ server <- function(input, output, session) {
     }
   },server=F, selection='single')
   
-  output$selectedSongO <- reactive(input$overallSong_cell_clicked$value)
-  
-  # Below lines of code is not working and crashes the app -C
-  # updateSelectInput(session=getDefaultReactiveDomain(),'song_name','Song Name', choices =  sort(unique(cleaned$SongName)), selected = output$selectedSongO)
-  # observeEvent(input$overallSong_cell_clicked$value, {updateSelectInput(session=getDefaultReactiveDomain(),
-  # 'song_name', selected = overallSong_cell_clicked$value)})
-  
-  observeEvent(input$jumpToIndivSongO,{updateTabsetPanel(session=getDefaultReactiveDomain(),
-                                                         'songs',
-                                                         selected = "Individual Song Data")})
-  # I need to somehow smash the two above lines (updateSelectInput and updateTabsetPanel) together. Can I do it in the same observeEvent code?
+  observeEvent(input$jumpToIndivSongO,{s = input$overallSong_cell_clicked$value
+  updateTabsetPanel(session=getDefaultReactiveDomain(),'songs', selected = "Individual Song Data")
+  updateSelectizeInput(session=getDefaultReactiveDomain(), 'song_name',selected=s)})
   
   # individual
   output$song_info <- renderTable({
@@ -694,7 +684,7 @@ server <- function(input, output, session) {
       filter(SongName == input$song_name) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
       filter(!is.na(TimeInHours))
-
+    
     
     p3 <- hchart(
       tb, "line",
@@ -707,7 +697,7 @@ server <- function(input, output, session) {
     
     p3
     
-
+    
   })
   
   output$songBig4Plot2 <- renderHighchart({
@@ -782,10 +772,11 @@ server <- function(input, output, session) {
         hc_title(text = "Hours Listened by Date")
     })
   
-  output$selectedArtist <- reactive(input$overallArtist_cell_clicked$value)
-  observeEvent(input$jumpToIndivArtist,{updateTabsetPanel(session=getDefaultReactiveDomain(),
-                                                         'artists',
-                                                         selected = "Individual Artist Data")})
+  
+  observeEvent(input$jumpToIndivArtist,{s = input$overallArtist_cell_clicked$value
+  updateTabsetPanel(session=getDefaultReactiveDomain(),'artists', selected = "Individual Artist Data")
+  updateSelectizeInput(session=getDefaultReactiveDomain(), 'artist_name',selected=s)})
+  
   
   
   ## by month
@@ -932,10 +923,9 @@ server <- function(input, output, session) {
     }
   },server=F,selection='single')
   
-  output$selectedSongM <- reactive(input$monthSong_cell_clicked$value)
-  observeEvent(input$jumpToIndivSongM,{updateTabsetPanel(session=getDefaultReactiveDomain(),
-                                                        'songs',
-                                                        selected = "Individual Song Data")})
+  observeEvent(input$jumpToIndivSongM,{s = input$monthSong_cell_clicked$value
+  updateTabsetPanel(session=getDefaultReactiveDomain(),'songs', selected = "Individual Song Data")
+  updateSelectizeInput(session=getDefaultReactiveDomain(), 'song_name',selected=s)})
   
   ########## ARTISTS #############
   
@@ -1010,7 +1000,7 @@ server <- function(input, output, session) {
       select(MaximumRank, DateOfMaxRank, SongCount)
   })
   
-
+  
   
   output$artistBig4Plot1 <- renderHighchart({
     
@@ -1089,12 +1079,12 @@ server <- function(input, output, session) {
   output$dateTimeListenNCA <-
     renderHighchart({
       #non-cumulative listening hours
-     
+      
       
       tb <- cleaned_artist %>%
         filter(Artist == input$artist_name, !is.na(TimeInHours)) %>%
         mutate(datenum = as.Date(dates, format = "%B %d %Y"))
-
+      
       hchart(
         tb, "line",
         hcaes(x =  datenum, y = dHours),
@@ -1247,7 +1237,7 @@ server <- function(input, output, session) {
     db_misc %>%
       select(input$month_name_bourgeoisie, SongName, Artist, Album) %>%
       na.omit()
-      
+    
   })
   
   overall_bour_stats <- reactive({
