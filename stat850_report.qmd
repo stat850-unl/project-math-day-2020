@@ -165,6 +165,8 @@ This project was a very valuable experience in terms of learning how to work wit
 
 In future iterations of this app, we would like to be able to implement some sort of user input app or information entry system. This could be a standalone thing or part of SAAM. Currently, the data is stored in Google Sheets, which then have to be downloaded to csv files, cleaned, and then read into SAAM. It would be really handy if we were able to expedite this process for the owner, and he was able to enter the data directly into SAAM and have it stored in a csv file in the correct format automatically.
 
+There are also some items on the SAAM wishlist that we did not get to due to time constraints, so it would be valuable to add these items if future work was being done on the app. For example, EXAMPLE
+
 
 ## Appendix
 ### Accreditations
