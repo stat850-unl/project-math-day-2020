@@ -255,6 +255,7 @@ ui <- fluidPage(
     # third big tab
     tabPanel("Albums",
              tabsetPanel(
+               id = 'albums',
                type = "tabs",
                tabPanel(
                  "Individual Album Data",
@@ -298,11 +299,10 @@ ui <- fluidPage(
                          ),
                          tabPanel(
                            "Overall Bourgeoisie Info",
-                           
                            mainPanel(
-                             dataTableOutput("overallBourgeoisie")
+                             dataTableOutput("overallBourgeoisie"),
+                             verbatimTextOutput('selectionB')
                            )
-                           
                          ))
     )    
   )
@@ -1264,8 +1264,7 @@ server <- function(input, output, session) {
   
   output$overallBourgeoisie <- renderDataTable({
     overall_bour_stats()
-  },server=F,selection='single')
-  
+  },server=F,selection='none')
 }
 
 # Run the application
