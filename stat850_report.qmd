@@ -6,7 +6,7 @@ format: html
 
 ## Abstract:
 
-This report outlines the data and methods used to create a music database based on one person's listening history. The database was built using R Shiny. We discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. The database is housed at <https://mollyc.shinyapps.io/project-math-day-2020/>.
+This report outlines the data and methods used to create a music database based on one person's listening history. The database was built using R Shiny. In this document, we discuss the data sets that are used, the methods and packages utilized, and the analyses conducted. We also describe the benefits of using Shiny apps for this type of project, and we discuss some possible changes or improvements to the app. The database is housed at <https://mollyc.shinyapps.io/project-math-day-2020/>.
 
 ### Keywords:
 
@@ -14,7 +14,8 @@ music database, Shiny app, R
 
 ## Introduction
 
-This report outlines the data and methods used to create a music database based on one person's listening history. We called the music database SAAM (Songs, Artists, Albums, and Miscellaneous). SAAM is a data visualization R Shiny app. The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delve into the data. 
+This report outlines the data and methods used to create a music database based on one person's listening history. We called the music database SAAM (Songs, Artists, Albums, and Miscellaneous). SAAM is a data visualization R Shiny app. The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delve into the data. Prior to our work on this project, all of the data that had been collected was stored in multiple Google Sheets, which would occasionally crash if the owner of the data tried to do any operation of some magnitude, such as sorting by a particular column.
+
 
 The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment. This interactivity was introduced through the use of multiple R packages and a user-friendly layout and interface.
 
@@ -54,7 +55,7 @@ The Miscellaneous data includes information and statistics about things that do 
 
 The main goal of the application is to present the data to a viewer in a clean, easy-to-access manner. The user should ideally be able to think of a song, artist, or album and see firstly if the song is in the data set and secondly see the statistics on that song.
  
-For the Songs and artists, there are two sub-tabs that the user can use to investigate the data set. These will be for overall and individual data for song/artist. "Overall" aims to encapsulate data about all songs. The user will be able to sort and filter their data. Each song will be hyperlinked to the individual song data page. "Individual" aims to give a deeper look at any specific song and how it has performed during its time being listened to. The code below gives is everything that will be shown to the user.
+For Songs, there are three sub-tabs that the user can use to investigate the data set. These will be for by month data, individual statistcs, and overall statistics.  "Individual" aims to give a deeper look at any specific song and how it has performed during its time being listened to. The code below gives is everything that will be shown to the user.
 
 ```{r,eval=F, messages=F}
 output$song_info <- renderTable({
@@ -122,24 +123,30 @@ output$song_info <- renderTable({
 
 This code will take a song name and return the following:
 
-1. Maximum Rank
-2. Artist Name
-3. Name of the Album
-4. Date Added
-5. Time in Hours Played
-6. Number of Plays
-7. 5 different plots, covering:
+1. Artist Name
+2. Name of the Album
+3. Date Added
+4. Maximum Rank and Date Maximum Rank was achieved
+5. Maximum dHours and Date Maximum dHours was achieved
+6. Rank
+7. Value
+8. Time in Hours Played
+9. Number of Plays
+10. 5 different plots, covering:
   *   Overall rank of the song over time
   *   Overall value of the song over time
   *   Cumulative hours listened over time
   *   Cumulative plats of the song over time
   *   Hours listened by date added
 
-Examples of the overall and individual are shown below.
-![Overall Example](images/over-song-example.png)
-![Individual Example](images/indiv-song-example.png)
+"Overall" aims to encapsulate data about all songs. The user will be able to sort and filter their data. Each song will be hyperlinked to the individual song data page. Examples of the by month, individual, and overall pages are shown below.
 
-The second page would automatically generate if the user clicks on "Instant Crush (feat. Julian Casablancas)" in the "Overall Song Data" tab.
+![By Month Example](images/bymo-song-example.png)
+
+![Individual Example](images/indiv-song-example.png)
+![Overall Example](images/over-song-example.png)
+
+The second page would automatically generate if the user clicks on "Instant Crush (feat. Julian Casablancas)" in the "By Month" tab or "Overall Song Data" tab.
 
 Artists and Albums tabs will follow closely to Songs regarding the content.
 
