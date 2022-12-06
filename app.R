@@ -376,7 +376,7 @@ server <- function(input, output, session) {
     
     cleaned %>%
       filter(SongName == input$song_name) %>%
-      filter(!is.na(TimeInHours)) %>%
+      filter(!is.na(TimeInHours), !is.na(dHours)) %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y"),
              rowN = first(which(RankOutOfN == MaxRank)),
              DateOfMaxRank = dates[rowN],
