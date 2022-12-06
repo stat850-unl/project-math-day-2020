@@ -260,7 +260,7 @@ ui <- fluidPage(
              tabsetPanel(
                type = "tabs",
                tabPanel(
-                 "Album Info",
+                 "Individual Album Data",
                  sidebarPanel(
                    selectizeInput(
                      "album_name",
@@ -393,7 +393,6 @@ server <- function(input, output, session) {
              LongestStreakOnBourgeoisie = as.integer(subBour$LongestStreak),
              CurrentStreakOnBourgeoisie = as.integer(subBour$CurrentStreak))
       
-    
   })
   
   
