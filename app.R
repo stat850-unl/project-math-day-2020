@@ -257,7 +257,7 @@ ui <- fluidPage(
              tabsetPanel(
                type = "tabs",
                tabPanel(
-                 "Album Info",
+                 "Individual Album Data",
                  sidebarPanel(
                    selectizeInput(
                      "album_name",
