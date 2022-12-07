@@ -175,8 +175,7 @@ ui <- fluidPage(
               ),
               selected = "-"
             ),
-            ## nothing has been done with the secondary sorting filter yet!
-            ## Does this need finishing or is this resolved? -C
+           
             checkboxGroupInput(
               "tertiarySortingFilter",
               "Include:",
