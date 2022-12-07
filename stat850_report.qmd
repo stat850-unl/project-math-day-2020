@@ -10,7 +10,7 @@ This report outlines the data and methods used to create a music database based 
 
 ### Keywords:
 
-music database, Shiny app, R
+music database, Shiny app, R, interactive statistics
 
 ## Introduction
 
@@ -236,6 +236,7 @@ This code will take a song name and return the following:
 
 "Overall" aims to encapsulate data about all songs. The user will be able to sort and filter their data. Each song will be hyperlinked to the individual song data page. Examples of the by month, individual, and overall pages are shown below.
 
+
 ![By Month Example](images/bymo-song-example.png)
 
 ![Individual Example](images/indiv-song-example.png)
@@ -268,6 +269,8 @@ Currently, the album tab only lists "Individual Album Data". There is minimal in
   *   Hours listened by date added
 
 The Miscellaneous tab tracks the songs on a playlist named "Bourgeoisie" created by the owner of the listening history data. This playlist is updated each month based on how much the owner is subjectively enjoying songs. So, the amount of time a song stays on the playlist is a metric of how enjoyable the song is to the owner, to some extent.
+
+Finally, the data tables on the By Month (song data), Overall Song Data, Overall Artist Data, and Overall Bourgeoisie Info tabs all are different compared to the one on Bourgeoisie Monthly: they are Data Tables from the DT package. This allows for the users to easily sort along any of the columns. Additionally, the data tables on By Month (song data), Overall Song Data, and Overall Artist Data have the ability to select cells. After the user selects a song name or an artist name, they are able to click the corresponding "Song Information" or "Artist Information" button to be redirected to either Individual Song Data or Individual Artist Data with their previously selection already chosen in the drop down menu. This is all done to help with ease of mobility on the site and improve the user experience.
 
 
 ## Discussion
