@@ -1,7 +1,7 @@
 ---
 title: "Creating a Music Database with User-Friendly Interface via Shiny"
 author: Charlie Bonk and Molly Creagar
-format: html
+format: pdf
 ---
 
 ## Abstract:
@@ -17,8 +17,7 @@ music database, Shiny app, R
 This report outlines the data and methods used to create a music database based on one person's listening history. We called the music database SAAM (Songs, Artists, Albums, and Miscellaneous). SAAM is a data visualization R Shiny app. The main purpose of SAAM is to allow a user to easily search through years of collected listening data of one user and take their own deeper delve into the data. Prior to our work on this project, all of the data that had been collected was stored in multiple Google Sheets, which would occasionally crash if the owner of the data tried to do any operation of some magnitude, such as sorting by a particular column.
 
 
-The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment. This interactivity was introduced through the use of multiple R packages and a user-friendly layout and interface.
-
+The interactivity of the app is paramount; we wanted the user to feel as though any curiosity they had about a song, artist, or album could be answered by themselves through the app, giving the user a greater sense of self accomplishment. This interactivity was introduced through the use of multiple R packages and a user-friendly layout and interface. Shiny apps are useful for this type of project because they allow data to be formatted in a very visual format, as well as allowing for dynamic and integrated sorting and filtering. We continue this document by discussing the data sets used for the project, the methods and analyses conducted, and some overall comments about the database. We also discuss a few possible changes that could be made in future iterations of the app.
 
 
 ## Data Description
