@@ -7,6 +7,14 @@
 #    http://shiny.rstudio.com/
 #
 
+###############################################################################
+##                               WELCOME TO SAAM                             ##
+##     YOUR PERSONAL DATABASE ACCESS TO SONGS, ARTISTS, ALBUMS, AND MORE     ##
+##                               ENJOY YOUR STAY!                            ##
+## ------------------------------------------------------------------------- ##
+##     Application Credits to Molly Creager and Charlie Bonk, 12/9/2022      ##
+###############################################################################
+
 ## WARNING: This will check for installed packages and install if they are not.
 ## If you want to read over the documentation on each package before installation,
 ## see "stat850-report.qmd".
@@ -32,7 +40,7 @@ cleaned_album <- readr::read_csv("data/cleaned_album.csv")
 db_misc <- readr::read_csv("data/db_misc.csv", guess_max = 1800)
 
 
-# Define UI for application
+### UI ###
 ui <- fluidPage(
   theme = shinytheme("flatly"),
   
@@ -40,15 +48,16 @@ ui <- fluidPage(
     # Application title
     title = "SAAM",
     
-    # Sidebar tabs
+    # Main Tabs (S,A,A,M)
+    # Songs Main Tab
     tabPanel(
       "Songs",
-      
+      # Individual Song Tabs
       tabsetPanel(
         id = 'songs',
         type = "tabs",
         
-        
+        # By Month Tab
         tabPanel(
           "By Month",
           
@@ -98,6 +107,7 @@ ui <- fluidPage(
           mainPanel(dataTableOutput("monthSong"))
         ),
         
+        # Individiual Song Tab
         tabPanel(
           "Individual Song Data",
           
@@ -121,6 +131,7 @@ ui <- fluidPage(
           )
         ),
         
+        #Overall Song Tab
         tabPanel(
           "Overall Song Data",
           
@@ -165,6 +176,7 @@ ui <- fluidPage(
               selected = "-"
             ),
             ## nothing has been done with the secondary sorting filter yet!
+            ## Does this need finishing or is this resolved? -C
             checkboxGroupInput(
               "tertiarySortingFilter",
               "Include:",
@@ -184,13 +196,14 @@ ui <- fluidPage(
     ),
     
     
-    # Second big tab
+    # Main Artists Tab
     tabPanel("Artists",
              
              tabsetPanel(
                id= 'artists',
                type = "tabs",
                
+               # Overall Artist Tab
                tabPanel(
                  "Overall Artist Data",
                  
@@ -229,6 +242,7 @@ ui <- fluidPage(
                  
                ),
                
+               # Individual Artist Tab
                tabPanel(
                  "Individual Artist Data",
                  
@@ -252,7 +266,8 @@ ui <- fluidPage(
              )),
     
     
-    # third big tab
+    # Main Albums Tab
+    # Also the only Albumns tab: There are no subtabs.
     tabPanel("Albums",
              tabsetPanel(
                id = 'albums',
@@ -277,11 +292,12 @@ ui <- fluidPage(
                  )
                ))),
     
-    
+    # Main Miscellaneous Tab
     tabPanel("Miscellaneous",
              
              tabsetPanel(type = "tabs",
                          
+                         # Bour. By Month Tab
                          tabPanel(
                            "Bourgeoisie by Month",
                            sidebarPanel(
@@ -297,6 +313,7 @@ ui <- fluidPage(
                              tableOutput("month_songs_bourgeoisie")
                            )
                          ),
+                         # Overall Bour. Tab
                          tabPanel(
                            "Overall Bourgeoisie Info",
                            mainPanel(
@@ -308,13 +325,14 @@ ui <- fluidPage(
   )
 )
 
+## END OF UI ##
 
 
 ### SERVER ######
 
 server <- function(input, output, session) {
-  ###### SONGS ###########
   
+  ###### SONGS ###########
   subset_plays_by_month <- reactive({
     cleaned %>%
       mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
@@ -394,7 +412,7 @@ server <- function(input, output, session) {
   })
   
   
-  # overall
+  # Overall Song Server
   output$overallSong <- renderDataTable({
     
     if("Most Time Improved" == input$secondarySortingFilter){
@@ -654,7 +672,7 @@ server <- function(input, output, session) {
   updateTabsetPanel(session=getDefaultReactiveDomain(),'songs', selected = "Individual Song Data")
   updateSelectizeInput(session=getDefaultReactiveDomain(), 'song_name',selected=s)})
   
-  # individual
+  # Individual Song Server
   output$song_info <- renderTable({
     song_static_info() %>%
       select(ArtistName, AlbumName, DateAdded)
@@ -779,7 +797,7 @@ server <- function(input, output, session) {
   
   
   
-  ## by month
+  # Monthly Song Server
   output$monthSong <- renderDataTable({
     if("Most Time Improved" == input$secondarySortingFilterMonth){
       if(("Album" %in% input$tertiarySortingFilterMonth) & ("Artist" %in% input$tertiarySortingFilterMonth)){
@@ -927,6 +945,8 @@ server <- function(input, output, session) {
   updateTabsetPanel(session=getDefaultReactiveDomain(),'songs', selected = "Individual Song Data")
   updateSelectizeInput(session=getDefaultReactiveDomain(), 'song_name',selected=s)})
   
+### END OF SONGS SERVER ###
+  
   ########## ARTISTS #############
   
   subset_artist_plays <- reactive({
@@ -976,7 +996,7 @@ server <- function(input, output, session) {
   })
   
   
-  
+  # Overall Artists Server
   output$overallArtist <- renderDataTable({
     subset_artist_plays() %>%
       select(Artist, TimeInHours, TimeInPlays) %>%
@@ -987,6 +1007,7 @@ server <- function(input, output, session) {
     
   },server=F,selection='single')
   
+  # Individual Artist Server
   output$artist_song_info <- renderTable({
     cln_artist_by_song_info() %>%
       select(SongName, Album, MaxRank) %>%
@@ -1095,7 +1116,7 @@ server <- function(input, output, session) {
       
     })
   
-  
+  ### END OF ARTISTS SERVER ###
   
   ########## ALBUMS #############
   
@@ -1228,6 +1249,7 @@ server <- function(input, output, session) {
         hc_title(text = "Hours Listened by Date")
     })
   
+  ### END ALBUMS SERVER ###
   
   
   ########## MISCELLANEOUS #############
@@ -1253,7 +1275,7 @@ server <- function(input, output, session) {
       select(NumberOfSongs) %>%
       slice_head(n=1)
   })
-  
+  # Monthly Bour. Server
   output$month_songs_bourgeoisie <- renderTable({
     month_subset() %>%
       arrange(SongName) %>%
@@ -1261,11 +1283,17 @@ server <- function(input, output, session) {
       select(n, SongName, Artist, Album)
   })
   
-  
+  # Overall Bour. Server
   output$overallBourgeoisie <- renderDataTable({
     overall_bour_stats()
   },server=F,selection='none')
+  
+  ### END MISC. SERVER ###
+  
+  ##### END OF SERVER #####
 }
 
 # Run the application
 shinyApp(ui = ui, server = server)
+
+### ALL DONE :) ###
