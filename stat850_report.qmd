@@ -54,7 +54,7 @@ The Miscellaneous data includes information and statistics about things that do 
 
 The main goal of the application is to present the data to a viewer in a clean, easy-to-access manner. The user should ideally be able to think of a song, artist, or album and see firstly if the song is in the data set and secondly see the statistics on that song.
  
-For Songs, there are three sub-tabs that the user can use to investigate the data set. These will be for by month data, individual statistcs, and overall statistics.  "Individual" aims to give a deeper look at any specific song and how it has performed during its time being listened to. The code below gives is everything that will be shown to the user.
+For Songs, there are three sub-tabs that the user can use to investigate the data set. These will be for by month data, individual statistcs, and overall statistics.  "Individual" aims to give a deeper look at any specific song and how it has performed during its time being listened to. The code below gives everything needed to make two of the tables (Song Static Info and Song Max Info) and one of the graphs (Non-Cumulative Listening Hours By Date): .
 
 ```{r,eval=F, messages=F}
 
@@ -104,97 +104,6 @@ For Songs, there are three sub-tabs that the user can use to investigate the dat
   output$song_max_info <- renderTable({
     cln_subset_overall_info() %>%
       select(MaximumRank, DateOfMaxRank, Max_dHours, DateOfMaxdHours) 
-  })
-  
-  output$song_big4 <- renderTable({
-    cln_subset() %>%
-      filter(!is.na(TimeInHours)) %>%
-      slice_tail(n = 1) %>%
-      select(RankOutOfN, ValueOutOf1, TimeInHours, TimeInPlays)
-  })
-  
-  output$bourgeoisie_song_info <- renderTable({
-    cln_subset_overall_info() %>%
-      select(MonthsOnBourgeoisie, LongestStreakOnBourgeoisie, CurrentStreakOnBourgeoisie)
-  })
-  
-
-  
-  output$songBig4Plot1 <- renderHighchart({
-    
-    
-    tb <- cleaned %>%
-      filter(SongName == input$song_name) %>%
-      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
-      filter(!is.na(TimeInHours))
-
-    
-    p3 <- hchart(
-      tb, "line",
-      hcaes(x =  datenum, y = RankOutOfN),
-      showInLegend = TRUE,
-      name = "Rank"
-    ) %>% 
-      hc_yAxis(reversed = TRUE)%>%
-      hc_title(text = "Overall Rank Over Time")
-    
-    p3
-    
-
-  })
-  
-  output$songBig4Plot2 <- renderHighchart({
-    
-    tb <- cleaned %>%
-      filter(SongName == input$song_name) %>%
-      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
-      filter(!is.na(TimeInHours))
-    
-    p4 <- hchart(
-      tb, "line",
-      hcaes(x =  datenum, y = ValueOutOf1),
-      showInLegend = TRUE,
-      name = "Value"
-    ) %>%
-      hc_title(text = "Overall Value Over Time")
-    
-    p4
-  })
-  
-  output$songBig4Plot3 <- renderHighchart({
-    
-    tb <- cleaned %>%
-      filter(SongName == input$song_name) %>%
-      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
-      filter(!is.na(TimeInHours))
-    
-    p1 <-  hchart(
-      tb, "line",
-      hcaes(x =  datenum, y = TimeInHours),
-      showInLegend = TRUE,
-      name = "Hours"
-    ) %>%
-      hc_title(text = "Cumulative Hours Listened Over Time")
-    
-    p1
-  })
-  
-  output$songBig4Plot4 <- renderHighchart({
-    
-    tb <- cleaned %>%
-      filter(SongName == input$song_name) %>%
-      mutate(datenum = as.Date(dates, format = "%B %d %Y")) %>%
-      filter(!is.na(TimeInHours))
-    
-    p2 <-  hchart(
-      tb, "line",
-      hcaes(x =  datenum, y = TimeInPlays),
-      showInLegend = TRUE,
-      name = "Hours"
-    ) %>%
-      hc_title(text = "Cumulative Plays Over Time")
-    
-    p2
   })
   
   
